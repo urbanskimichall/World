@@ -1,5 +1,6 @@
 #include "World.hpp"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 void World::create()
 {
@@ -7,6 +8,8 @@ void World::create()
         sf::CircleShape shape(100.f);
         shape.setFillColor(sf::Color::Green);
         window.setFramerateLimit(60);
+
+        sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
 
         while (window.isOpen())
         {
@@ -24,8 +27,11 @@ void World::create()
                     }
                 }
             }
+            const sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
             window.clear();
+            window.setView(fixedView);
+            grid.findPoint(mouseWorld);
             grid.draw(window);
             //window.draw(shape);
             window.display();

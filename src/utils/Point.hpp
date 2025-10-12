@@ -36,5 +36,10 @@ namespace utils
         {
             return Point(x / scalar, y / scalar);
         }
+        
+        bool operator==(const Point &other) const
+        {
+            return std::abs(x - other.x) < 1e-9 && std::abs(y - other.y) < 1e-9;
+        }
     };
 }

@@ -9,5 +9,5 @@ public:
     void create();
 
 private:
-    grid::Grid grid{40, 25.0};
+    grid::Grid grid{10, 25.0};
 };

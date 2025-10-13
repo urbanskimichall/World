@@ -22,7 +22,7 @@ endif()
 
 # ✅ Główne źródła projektu
 add_executable(${PROJECT_NAME}
-    main.cpp grid/Grid.cpp grid/Grid.hpp World.hpp World.cpp
+    main.cpp grid/Grid.cpp grid/Grid.hpp World.hpp World.cpp components/Component.cpp components/Component.hpp
 )
 
 # 🔹 Ścieżki nagłówków

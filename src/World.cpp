@@ -26,12 +26,15 @@ void World::create()
                         window.close();
                     }
                 }
+                component.handleEvent(*event, window);
             }
             const sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
             window.clear();
             window.setView(fixedView);
+            component.draw(window);
             grid.findPoint(mouseWorld);
+            grid.detectPointsOnComponent(component.getDescriptor());
             grid.draw(window);
             //window.draw(shape);
             window.display();

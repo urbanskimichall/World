@@ -3,8 +3,8 @@
 #include <utility>
 #include <cmath>
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
 #include "../utils/Point.hpp"
+#include "../components/ComponentDescriptor.hpp"
 
 namespace grid
 {
@@ -28,6 +28,18 @@ public:
 
     void draw(sf::RenderWindow &window) const;
     void findPoint(const sf::Vector2f &mousePos);
+    void detectPointsOnComponent(const components::RectComponentDescriptor &component)
+    {
+        for (auto &node : gridNodes)
+        {
+            node.isHighlighted = false;
+            if (component.position.x <= node.point.x && node.point.x <= component.position.x + component.width &&
+                component.position.y <= node.point.y && node.point.y <= component.position.y + component.height)
+            {
+                node.isHighlighted = true;
+            }
+        }
+    }
 
 private:
     void generateGrid();

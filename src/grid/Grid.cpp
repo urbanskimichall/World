@@ -16,11 +16,6 @@ namespace grid
             if (node.isHighlighted)
             {
                 shape.setFillColor(sf::Color::Red);
-                // std::cout << "Highlighted Point: (" << node.point.x << ", " << node.point.y << ")\n";
-                // for (const auto &neighbor : node.neighbors)
-                // {
-                //     std::cout << "  Neighbor: (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
-                // }
             }
             // window.draw(lines);
             window.draw(shape);
@@ -88,9 +83,6 @@ namespace grid
             }
         }
 
-        for (const auto& node : gridNodes) {
-            std::cout << "Point: (" << node.point.x << ", " << node.point.y << ")\n";
-        }
         //to be refactored
         // Establish neighbors for each node in the triangular grid
     

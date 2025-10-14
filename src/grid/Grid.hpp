@@ -28,15 +28,19 @@ public:
 
     void draw(sf::RenderWindow &window) const;
     void findPoint(const sf::Vector2f &mousePos);
-    void detectPointsOnComponent(const components::RectComponentDescriptor &component)
+    const std::vector<Node> &getGridNodes() const { return gridNodes; }
+    void detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components)
     {
         for (auto &node : gridNodes)
         {
             node.isHighlighted = false;
-            if (component.position.x <= node.point.x && node.point.x <= component.position.x + component.width &&
-                component.position.y <= node.point.y && node.point.y <= component.position.y + component.height)
+            for (const auto &comp : components)
             {
-                node.isHighlighted = true;
+                if (node.point.x >= comp.position.x && node.point.x <= comp.position.x + comp.width &&
+                    node.point.y >= comp.position.y && node.point.y <= comp.position.y + comp.height)
+                {
+                    node.isHighlighted = true;
+                }
             }
         }
     }

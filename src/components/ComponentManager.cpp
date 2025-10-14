@@ -27,8 +27,8 @@ void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindo
             if (checkCollision(components[i], components[j]))
             {
                 // Example: print or mark components
-                // components[i].blockMovementOnCollision(true);
-                // components[j].blockMovementOnCollision(true);
+                 components[i].blockMovementOnCollision(true);
+                 components[j].blockMovementOnCollision(true);
                 std::cout << "Collision detected between " << i << " and " << j << "\n";
 
             }

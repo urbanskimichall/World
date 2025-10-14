@@ -70,4 +70,29 @@ namespace components
     {
         target.draw(rectangle);
     }
+
+    const grid::Grid::Node *Component::findClosestNode(const sf::Vector2f &position) const
+    {
+        const grid::Grid::Node *closestNode = nullptr;
+        float minDistance = std::numeric_limits<float>::max();
+        const auto gridNodes = grid.getGridNodes();
+        if (gridNodes.empty())
+        {
+            return nullptr;
+        }
+
+        for (const auto &node : gridNodes)
+        {
+            float dx = node.point.x - position.x;
+            float dy = node.point.y - position.y;
+            float distance = std::sqrt(dx * dx + dy * dy);
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestNode = &node;
+            }
+        }
+        return closestNode;
+    }
 } // namespace components

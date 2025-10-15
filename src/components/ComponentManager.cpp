@@ -16,9 +16,9 @@ bool ComponentManager::checkCollision(const Component &a, const Component &b) co
 void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
 {
     // Pass events to each component, then check for collisions
-    for (auto &comp : components)
+    for (auto &component : components)
     {
-        comp.handleEvent(event, window);
+        component.handleEvent(event, window);
     }
 
     // 🧱 Simple collision response: just detect for now

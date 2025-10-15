@@ -18,6 +18,12 @@ namespace components
             const auto node = findClosestNode({xPosition, yPosition});
             rectangle.setFillColor(color);
             rectangle.setPosition({node->point.x, node->point.y});
+            sf::Vector2f oldOrigin = rectangle.getOrigin();
+            sf::Vector2f oldPos = rectangle.getPosition();
+            sf::Vector2f newOrigin = {0.f, rectangle.getSize().y};
+            sf::Vector2f offset = newOrigin - oldOrigin;
+            rectangle.setOrigin(newOrigin);
+            rectangle.setPosition(oldPos + offset);
             length = utils::roundUpToMultiple(length, (grid.getSpacing()));
             const auto distanceToRightNeighbor = node->distanceOnYAxis(*node->neighbors[1]);
             height = utils::roundUpToMultiple(height, (distanceToRightNeighbor));

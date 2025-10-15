@@ -29,21 +29,11 @@ public:
     void draw(sf::RenderWindow &window) const;
     void findPoint(const sf::Vector2f &mousePos);
     const std::vector<Node> &getGridNodes() const { return gridNodes; }
-    void detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components)
-    {
-        for (auto &node : gridNodes)
-        {
-            node.isHighlighted = false;
-            for (const auto &comp : components)
-            {
-                if (node.point.x >= comp.position.x && node.point.x <= comp.position.x + comp.width &&
-                    node.point.y >= comp.position.y && node.point.y <= comp.position.y + comp.height)
-                {
-                    node.isHighlighted = true;
-                }
-            }
-        }
-    }
+    std::vector<Node> &getGridNodes() { return gridNodes; }
+    void detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components);
+    double getSpacing() const { return spacing; }
+    void moveAllNodes(const sf::Vector2f &delta);
+    float adjustPositionToGrid(float length) const;
 
 private:
     void generateGrid();

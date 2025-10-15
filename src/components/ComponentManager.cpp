@@ -17,7 +17,9 @@ void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindo
 {
     // Pass events to each component, then check for collisions
     for (auto &comp : components)
+    {
         comp.handleEvent(event, window);
+    }
 
     // 🧱 Simple collision response: just detect for now
     for (size_t i = 0; i < components.size(); ++i)
@@ -27,10 +29,9 @@ void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindo
             if (checkCollision(components[i], components[j]))
             {
                 // Example: print or mark components
-                 components[i].blockMovementOnCollision(true);
-                 components[j].blockMovementOnCollision(true);
-                std::cout << "Collision detected between " << i << " and " << j << "\n";
-
+                // components[i].blockMovementOnCollision(true);
+                // components[j].blockMovementOnCollision(true);
+                // std::cout << "Collision detected between " << i << " and " << j << "\n";
             }
         }
     }
@@ -50,4 +51,13 @@ void ComponentManager::draw(sf::RenderTarget &target) const
 {
     for (const auto &c : components)
         c.draw(target);
+}
+
+void ComponentManager::moveAllComponents(const sf::Vector2f &delta)
+{
+    for (auto &comp : components)
+    {
+        const auto currentPos = comp.getDescriptor().position;
+        comp.setPosition({currentPos.x + delta.x, currentPos.y + delta.y});
+    }
 }

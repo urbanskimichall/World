@@ -56,6 +56,36 @@ namespace grid
         }
     }
 
+    void Grid::detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components)
+    {
+        for (auto &node : gridNodes)
+        {
+            node.isHighlighted = false;
+            for (const auto &comp : components)
+            {
+                if (node.point.x >= comp.position.x && node.point.x <= comp.position.x + comp.width &&
+                    node.point.y >= comp.position.y && node.point.y <= comp.position.y + comp.height)
+                {
+                    node.isHighlighted = true;
+                }
+            }
+        }
+    }
+
+    void Grid::moveAllNodes(const sf::Vector2f &delta)
+    {
+        for (auto &node : gridNodes)
+        {
+            node.point.x += delta.x;
+            node.point.y += delta.y;
+        }
+    }
+
+    float Grid::adjustPositionToGrid(float length) const
+    {
+        return length / spacing * gridNodes.front().neighbors.front()->point.distanceTo(gridNodes.front().point);
+    }
+
     void Grid::generateGrid()
     {
         gridNodes.clear();
@@ -83,9 +113,8 @@ namespace grid
             }
         }
 
-        //to be refactored
-        // Establish neighbors for each node in the triangular grid
-    
+        // to be refactored
+        //  Establish neighbors for each node in the triangular grid
 
         auto index = [numCols](int r, int c)
         { return r * numCols + c; };

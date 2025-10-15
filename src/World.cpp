@@ -4,45 +4,82 @@
 
 void World::create()
 {
-        sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML 3 + C++23");
-        sf::CircleShape shape(100.f);
-        shape.setFillColor(sf::Color::Green);
-        window.setFramerateLimit(60);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML 3 + C++23");
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+    window.setFramerateLimit(60);
 
-        componentManager.addComponent(components::Component{grid, 0, 0, 30, 40, sf::Color::Cyan});
-        componentManager.addComponent(components::Component{grid, 50.f, 60.f, 60.f, 120.f, sf::Color::Yellow});
-        componentManager.addComponent(components::Component{grid, 110.f, 120.f, 80.f, 20.f, sf::Color::White});
-        componentManager.addComponent(components::Component{grid, 200.f, 200.f, 10.f, 70.f, sf::Color::Magenta});
+    componentManager.addComponent(components::Component{grid, 0, 0, 30, 40, sf::Color::Cyan});
+    componentManager.addComponent(components::Component{grid, 50.f, 60.f, 60.f, 120.f, sf::Color::Yellow});
+    componentManager.addComponent(components::Component{grid, 110.f, 120.f, 80.f, 20.f, sf::Color::White});
+    componentManager.addComponent(components::Component{grid, 200.f, 200.f, 10.f, 70.f, sf::Color::Magenta});
 
-        sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
+    sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
 
-        while (window.isOpen())
+    while (window.isOpen())
+    {
+        while (const std::optional event = window.pollEvent())
         {
-            while (const std::optional event = window.pollEvent())
+            if (event->is<sf::Event::Closed>())
             {
-                if (event->is<sf::Event::Closed>())
+                window.close();
+            }
+            else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
                 {
                     window.close();
                 }
-                else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
-                {
-                    if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-                    {
-                        window.close();
-                    }
-                }
-                componentManager.handleEvent(*event, window);
             }
-            const sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            componentManager.handleEvent(*event, window);
 
-            window.clear();
-            window.setView(fixedView);
-            componentManager.draw(window);
-            grid.findPoint(mouseWorld);
-            grid.detectPointsOnComponent(componentManager.getAllDescriptors());
+            if (event->is<sf::Event::MouseButtonPressed>())
+            {
+                const auto &mouse = event->getIf<sf::Event::MouseButtonPressed>();
+                if (mouse->button == sf::Mouse::Button::Right)
+                {
+                    isPanning = true;
+                    std::cout << "Started panning\n";
+                    lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                }
+            }
+            // Stop panning
+            else if (event->is<sf::Event::MouseButtonReleased>())
+            {
+                const auto &mouse = event->getIf<sf::Event::MouseButtonReleased>();
+                if (mouse->button == sf::Mouse::Button::Right)
+                    isPanning = false;
+            }
+            // Handle movement
+            else if (event->is<sf::Event::MouseMoved>() && isPanning)
+            {
+                sf::Vector2f currentPos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                sf::Vector2f delta = currentPos - lastMousePos;
+                lastMousePos = currentPos;
+                std::cout << "Panning by: (" << delta.x << ", " << delta.y << ")\n";
 
-            grid.draw(window);
-            //window.draw(shape);
-            window.display();
+                moveWorld(delta);
+            }
         }
+
+        // Start panning
+
+        const sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+        window.clear();
+        window.setView(fixedView);
+        componentManager.draw(window);
+        grid.findPoint(mouseWorld);
+        grid.detectPointsOnComponent(componentManager.getAllDescriptors());
+
+        grid.draw(window);
+        // window.draw(shape);
+        window.display();
+    }
+}
+
+void World::moveWorld(const sf::Vector2f &delta)
+{
+    grid.moveAllNodes(delta);
+    componentManager.moveAllComponents(delta);
 }

@@ -13,6 +13,7 @@ namespace components
         void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
         void draw(sf::RenderTarget& target) const;
         std::vector<RectComponentDescriptor> getAllDescriptors() const;
+        void moveAllComponents(const sf::Vector2f &delta);
 
     private:
         std::vector<Component> components;

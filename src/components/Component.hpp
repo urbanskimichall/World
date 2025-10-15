@@ -3,6 +3,8 @@
 #include <SFML/Window/Event.hpp>
 #include "ComponentDescriptor.hpp"
 #include "../grid/Grid.hpp"
+#include "../utils/Round.hpp"
+#include <iostream>
 
 namespace components
 {
@@ -10,15 +12,16 @@ namespace components
     class Component
     {
     public:
-        Component(const grid::Grid &grid, float xPosition = 0.f, float yPosition = 0.f, float length = 90.f, float height = 45.f, sf::Color color = sf::Color::Green)
+        Component(const grid::Grid &grid, float xPosition = 0.f, float yPosition = 0.f, double length = 90.f, double height = 45.f, sf::Color color = sf::Color::Green)
             : grid(grid), isDragging(false)
         {
             const auto node = findClosestNode({xPosition, yPosition});
             rectangle.setFillColor(color);
             rectangle.setPosition({node->point.x, node->point.y});
-            length = grid.adjustPositionToGrid(length);
-            height = grid.adjustPositionToGrid(height);
-            rectangle.setSize({length, height});
+            length = utils::roundUpToMultiple(length, (grid.getSpacing()));
+            const auto distanceToRightNeighbor = node->distanceOnYAxis(*node->neighbors[1]);
+            height = utils::roundUpToMultiple(height, (distanceToRightNeighbor));
+            rectangle.setSize({static_cast<float>(length), static_cast<float>(height)});
         }
 
         void handleEvent(const sf::Event &event, const sf::RenderWindow &window);

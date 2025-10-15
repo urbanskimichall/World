@@ -12,7 +12,7 @@ public:
 
 private:
     void moveWorld(const sf::Vector2f &delta);
-    grid::Grid grid{50, 15.0};
+    grid::Grid grid{10, 30.0};
     components::ComponentManager componentManager{};
 
     bool isPanning = false;

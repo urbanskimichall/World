@@ -97,6 +97,10 @@ namespace grid
         int numCols = numRows;
 
         generateGridPoints(numRows, numCols);
+        for(auto &node : gridNodes) {
+            std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
+        }
+
         generateGridLines(numRows, numCols);
     }
 

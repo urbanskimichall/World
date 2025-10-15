@@ -55,9 +55,9 @@ void ComponentManager::draw(sf::RenderTarget &target) const
 
 void ComponentManager::moveAllComponents(const sf::Vector2f &delta)
 {
-    for (auto &comp : components)
+    for (auto &component : components)
     {
-        const auto currentPos = comp.getDescriptor().position;
-        comp.setPosition({currentPos.x + delta.x, currentPos.y + delta.y});
+        const auto currentPos = component.getDescriptor().position;
+        component.setPosition({static_cast<float>(currentPos.x + delta.x), static_cast<float>(currentPos.y + delta.y)});
     }
 }

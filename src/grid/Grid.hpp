@@ -18,6 +18,9 @@ public:
         Point point;
         bool isHighlighted = false;
         std::vector<Node*> neighbors;
+        double distanceOnYAxis(const Node& other) const {
+            return std::abs(point.y - other.point.y);
+        }
     };
 
     // Constructs a triangular grid with given number of rows and spacing

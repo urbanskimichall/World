@@ -24,6 +24,7 @@ endif()
 add_executable(${PROJECT_NAME}
     main.cpp grid/Grid.cpp grid/Grid.hpp World.hpp World.cpp components/Component.cpp components/Component.hpp
     components/ComponentManager.cpp components/ComponentManager.hpp
+    components/QuadrangleComponent.cpp components/QuadrangleComponent.hpp
 )
 
 # 🔹 Ścieżki nagłówków

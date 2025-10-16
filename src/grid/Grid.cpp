@@ -1,4 +1,5 @@
 #include "Grid.hpp"
+#include "GridSpacing.hpp"
 #include <SFML/Graphics.hpp>
 #include <limits>
 #include <iostream>
@@ -58,15 +59,22 @@ namespace grid
 
     void Grid::detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components)
     {
+        constexpr float EPSILON = GRID_SPACING / 10.0f;
         for (auto &node : gridNodes)
         {
             node.isHighlighted = false;
             for (const auto &comp : components)
             {
-                if (node.point.x >= comp.position.x && node.point.x <= comp.position.x + comp.width &&
-                    node.point.y >= comp.position.y && node.point.y <= comp.position.y + comp.height)
+                float left = comp.position.x - EPSILON;
+                float right = comp.position.x + comp.width + EPSILON;
+                float top = comp.position.y - EPSILON;
+                float bottom = comp.position.y + comp.height + EPSILON;
+
+                if (node.point.x >= left && node.point.x <= right &&
+                    node.point.y >= top && node.point.y <= bottom)
                 {
                     node.isHighlighted = true;
+                    break;
                 }
             }
         }
@@ -97,7 +105,8 @@ namespace grid
         int numCols = numRows;
 
         generateGridPoints(numRows, numCols);
-        for(auto &node : gridNodes) {
+        for (auto &node : gridNodes)
+        {
             std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
         }
 

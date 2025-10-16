@@ -13,7 +13,7 @@ public:
 
 private:
     void moveWorld(const sf::Vector2f &delta);
-    grid::Grid grid{30, grid::GRID_SPACING};
+    grid::Grid grid{grid::numOfRows, grid::GRID_SPACING};
     components::ComponentManager componentManager{};
 
     bool isPanning = false;

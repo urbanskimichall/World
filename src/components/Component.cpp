@@ -30,15 +30,15 @@ namespace components
         }
         else if (event.is<sf::Event::MouseMoved>() && isDragging)
         {
-            sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            const sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
             sf::Vector2f newPos = mousePos + dragOffset;
 
-            // Snap to grid node if needed
+            // follow grid
             const Node *closest = findClosestNode(newPos);
             if (closest)
+            {
                 newPos = {closest->point.x, closest->point.y};
-
-            // Now attempt the move with collision detection
+            }
             tryMove(newPos, others);
         }
     }
@@ -67,9 +67,9 @@ namespace components
 
         for (const auto &node : gridNodes)
         {
-            float dx = node.point.x - position.x;
-            float dy = node.point.y - position.y;
-            float distance = std::sqrt(dx * dx + dy * dy);
+            const float dx = node.point.x - position.x;
+            const float dy = node.point.y - position.y;
+            const float distance = std::sqrt(dx * dx + dy * dy);
 
             if (distance < minDistance)
             {
@@ -96,15 +96,16 @@ namespace components
     bool Component::tryMove(const sf::Vector2f &newPos,
                             const std::vector<Component *> &others)
     {
-        // Save previous position so we can roll back if needed
+        // Save previous position if rollback is needed
         sf::Vector2f prevPos = rectangle.getPosition();
         rectangle.setPosition(newPos);
 
-        // Check for collisions with other components
-        for (auto *other : others)
+        for (const auto *other : others)
         {
             if (other == this)
-                continue; // skip self
+            {
+                continue;
+            }
 
             if (convexPolygonsIntersect(getTransformedPoints(), other->getTransformedPoints()))
             {
@@ -113,8 +114,6 @@ namespace components
                 return false;
             }
         }
-
-        // No collisions → movement successful
         return true;
     }
 } // namespace components

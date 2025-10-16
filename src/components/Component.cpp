@@ -1,9 +1,10 @@
 #include "Component.hpp"
+#include "CollisionDetection.hpp"
 #include <iostream>
 
 namespace components
 {
-    void Component::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
+    void Component::handleEvent(const sf::Event &event, const sf::RenderWindow &window, const std::vector<Component *> &others)
     {
         if (event.is<sf::Event::MouseButtonPressed>())
         {
@@ -30,32 +31,15 @@ namespace components
         else if (event.is<sf::Event::MouseMoved>() && isDragging)
         {
             sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-            if (isBlocked)
-            {
-                std::cout << "Movement blocked due to collision.\n";
-                return;
-            }
-
             sf::Vector2f newPos = mousePos + dragOffset;
 
-            // Find the nearest grid node (snap)
-
+            // Snap to grid node if needed
             const Node *closest = findClosestNode(newPos);
             if (closest)
-            {
-                // Snap component center to node position
-                sf::Vector2f size = rectangle.getSize();
+                newPos = {closest->point.x, closest->point.y};
 
-                rectangle.setPosition(
-                    {closest->point.x,
-                     closest->point.y});
-            }
-
-            else
-            {
-                // No grid nodes available — fallback to free movement
-                rectangle.setPosition(newPos);
-            }
+            // Now attempt the move with collision detection
+            tryMove(newPos, others);
         }
     }
 
@@ -94,5 +78,43 @@ namespace components
             }
         }
         return closestNode;
+    }
+
+    std::vector<sf::Vector2f> Component::getTransformedPoints() const
+    {
+        std::vector<sf::Vector2f> points;
+        auto transform = rectangle.getTransform();
+        sf::Vector2f size = rectangle.getSize();
+
+        points.push_back(transform.transformPoint({0.f, 0.f}));
+        points.push_back(transform.transformPoint({size.x, 0.f}));
+        points.push_back(transform.transformPoint({size.x, size.y}));
+        points.push_back(transform.transformPoint({0.f, size.y}));
+        return points;
+    }
+
+    bool Component::tryMove(const sf::Vector2f &newPos,
+                            const std::vector<Component *> &others)
+    {
+        // Save previous position so we can roll back if needed
+        sf::Vector2f prevPos = rectangle.getPosition();
+        rectangle.setPosition(newPos);
+
+        // Check for collisions with other components
+        for (auto *other : others)
+        {
+            if (other == this)
+                continue; // skip self
+
+            if (convexPolygonsIntersect(getTransformedPoints(), other->getTransformedPoints()))
+            {
+                std::cout << "Collision detected during move!\n";
+                rectangle.setPosition(prevPos);
+                return false;
+            }
+        }
+
+        // No collisions → movement successful
+        return true;
     }
 } // namespace components

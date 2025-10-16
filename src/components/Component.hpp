@@ -30,7 +30,7 @@ namespace components
             rectangle.setSize({static_cast<float>(length), static_cast<float>(height)});
         }
 
-        void handleEvent(const sf::Event &event, const sf::RenderWindow &window);
+        void handleEvent(const sf::Event &event, const sf::RenderWindow &window, const std::vector<Component *> &others);
         RectComponentDescriptor getDescriptor() const;
         void draw(sf::RenderTarget &target) const;
         void blockMovementOnCollision(bool block) { isBlocked = block; }
@@ -38,6 +38,8 @@ namespace components
         void setPosition(const sf::Vector2f &position) { rectangle.setPosition(position); }
 
     private:
+        std::vector<sf::Vector2f> getTransformedPoints() const;
+        bool tryMove(const sf::Vector2f& newPos, const std::vector<Component*>& others);
         const grid::Grid &grid;
         sf::RectangleShape rectangle;
         bool isDragging;

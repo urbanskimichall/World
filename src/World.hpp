@@ -4,6 +4,7 @@
 #include "grid/Grid.hpp"
 #include "components/Component.hpp"
 #include "components/ComponentManager.hpp"
+#include "grid/GridSpacing.hpp"
 
 class World
 {
@@ -12,7 +13,7 @@ public:
 
 private:
     void moveWorld(const sf::Vector2f &delta);
-    grid::Grid grid{10, 30.0};
+    grid::Grid grid{30, grid::GRID_SPACING};
     components::ComponentManager componentManager{};
 
     bool isPanning = false;

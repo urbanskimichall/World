@@ -15,10 +15,16 @@ bool ComponentManager::checkCollision(const Component &a, const Component &b) co
 
 void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
 {
-    // Pass events to each component, then check for collisions
+    std::vector<Component*> componentsPtrs;
+    componentsPtrs.reserve(components.size());
+    for (auto& c : components)
+    {
+        componentsPtrs.push_back(&c);
+    }
+
     for (auto &component : components)
     {
-        component.handleEvent(event, window);
+        component.handleEvent(event, window, componentsPtrs);
     }
 
     // 🧱 Simple collision response: just detect for now

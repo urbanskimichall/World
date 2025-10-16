@@ -104,13 +104,13 @@ namespace grid
         generateGridLines(numRows, numCols);
     }
 
-    void Grid::generateGridPoints(int numRows, int numCols)
+    void Grid::generateGridPoints(uint32_t numRows, uint32_t numCols)
     {
         gridNodes.clear();
-        for (int row = 0; row < numRows; ++row)
+        for (uint32_t row = 0; row < numRows; ++row)
         {
             double y = row * spacing * std::sqrt(3) / 2.0;
-            for (int col = 0; col < numCols; ++col)
+            for (uint32_t col = 0; col < numCols; ++col)
             {
                 double x = col * spacing + (row % 2 == 1 ? spacing / 2.0 : 0.0);
                 gridNodes.emplace_back(Node{.point = {x, y}});
@@ -123,9 +123,9 @@ namespace grid
         auto index = [numCols](int r, int c)
         { return r * numCols + c; };
 
-        for (int row = 0; row < numRows; ++row)
+        for (uint32_t row = 0; row < numRows; ++row)
         {
-            for (int col = 0; col < numCols; ++col)
+            for (uint32_t col = 0; col < numCols; ++col)
             {
                 Node &node = gridNodes[index(row, col)];
 
@@ -155,23 +155,23 @@ namespace grid
         }
     }
 
-    void Grid::generateGridLines(int numRows, int numCols)
+    void Grid::generateGridLines(uint32_t numRows, uint32_t numCols)
     {
         lines.clear();
-        for (int row = 0; row < numRows; ++row)
+        for (uint32_t row = 0; row < numRows; ++row)
         {
-            for (int col = 0; col < numCols; ++col)
+            for (uint32_t col = 0; col < numCols; ++col)
             {
-                int idx = row * numCols + col;
-                if (idx >= static_cast<int>(gridNodes.size()))
+                uint32_t idx = row * numCols + col;
+                if (idx >= static_cast<uint32_t>(gridNodes.size()))
                     continue;
 
-                auto addLine = [&](int r2, int c2)
+                auto addLine = [&](uint32_t r2, uint32_t c2)
                 {
                     if (r2 >= 0 && r2 < numRows && c2 >= 0 && c2 < numCols)
                     {
-                        int idx2 = r2 * numCols + c2;
-                        if (idx2 < static_cast<int>(gridNodes.size()))
+                        uint32_t idx2 = r2 * numCols + c2;
+                        if (idx2 < static_cast<uint32_t>(gridNodes.size()))
                         {
                             lines.append(sf::Vertex(
                                 sf::Vector2f(gridNodes[idx].point.x, gridNodes[idx].point.y), sf::Color::White));

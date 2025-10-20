@@ -4,7 +4,6 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 #include "../utils/Point.hpp"
-#include "../components/ComponentDescriptor.hpp"
 
 namespace grid
 {
@@ -33,10 +32,34 @@ namespace grid
         void findPoint(const sf::Vector2f &mousePos);
         const std::vector<Node> &getGridNodes() const { return gridNodes; }
         std::vector<Node> &getGridNodes() { return gridNodes; }
-        void detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components);
+
         double getSpacing() const { return spacing; }
         void moveAllNodes(const sf::Vector2f &delta);
         float adjustPositionToGrid(float length) const;
+
+        const grid::Grid::Node *findClosestNode(const sf::Vector2f &position) const
+        {
+            const grid::Grid::Node *closestNode = nullptr;
+            float minDistance = std::numeric_limits<float>::max();
+            if (gridNodes.empty())
+            {
+                return nullptr;
+            }
+
+            for (const auto &node : gridNodes)
+            {
+                const float dx = node.point.x - position.x;
+                const float dy = node.point.y - position.y;
+                const float distance = std::sqrt(dx * dx + dy * dy);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestNode = &node;
+                }
+            }
+            return closestNode;
+        }
 
     private:
         void generateGrid();

@@ -1,4 +1,6 @@
 #include "World.hpp"
+#include "components/RectangleComponent.hpp"
+#include "components/QuadrangleComponent.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -9,10 +11,9 @@ void World::create()
     shape.setFillColor(sf::Color::Green);
     window.setFramerateLimit(60);
 
-    componentManager.addComponent(components::Component{grid, 0, 0, 30, 40, sf::Color::Cyan});
-    componentManager.addComponent(components::Component{grid, 50.f, 60.f, 60.f, 120.f, sf::Color::Yellow});
-    componentManager.addComponent(components::Component{grid, 110.f, 120.f, 80.f, 20.f, sf::Color::White});
-    componentManager.addComponent(components::Component{grid, 200.f, 200.f, 10.f, 70.f, sf::Color::Magenta});
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 50.f}, sf::Vector2f{100.f, 50.f}, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 250.f}, sf::Vector2f{200.f, 50.f}, sf::Color::Yellow);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 250.f}, sf::Color::Cyan);
 
     sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
 
@@ -70,7 +71,10 @@ void World::create()
         window.setView(fixedView);
         componentManager.draw(window);
         grid.findPoint(mouseWorld);
-        grid.detectPointsOnComponent(componentManager.getAllDescriptors());
+        for (const auto &comp : componentManager.getComponents())
+        {
+            comp->detectPointsOnComponent(componentManager.getComponents());
+        }
 
         grid.draw(window);
         // window.draw(shape);

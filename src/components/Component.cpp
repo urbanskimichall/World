@@ -4,7 +4,7 @@
 
 namespace components
 {
-    void Component::handleEvent(const sf::Event &event, const sf::RenderWindow &window, const std::vector<Component *> &others)
+    void Component::handleEvent(const sf::Event &event, const sf::RenderWindow &window, const std::vector<std::unique_ptr<Component>> &others)
     {
         if (event.is<sf::Event::MouseButtonPressed>())
         {
@@ -94,15 +94,15 @@ namespace components
     }
 
     bool Component::tryMove(const sf::Vector2f &newPos,
-                            const std::vector<Component *> &others)
+                            const std::vector<std::unique_ptr<Component>> &others)
     {
         // Save previous position if rollback is needed
         sf::Vector2f prevPos = rectangle.getPosition();
         rectangle.setPosition(newPos);
 
-        for (const auto *other : others)
+        for (const auto& other : others)
         {
-            if (other == this)
+            if (other.get() == this)
             {
                 continue;
             }

@@ -4,6 +4,7 @@
 #include <limits>
 #include <iostream>
 #include <array>
+#include <algorithm>
 
 namespace grid
 {
@@ -54,29 +55,6 @@ namespace grid
             std::find_if(gridNodes.begin(), gridNodes.end(), [this](const Node &n)
                          { return n.point == *highlightedPoint; })
                 ->isHighlighted = true;
-        }
-    }
-
-    void Grid::detectPointsOnComponent(const std::vector<components::RectComponentDescriptor> &components)
-    {
-        constexpr float EPSILON = GRID_SPACING / 10.0f;
-        for (auto &node : gridNodes)
-        {
-            node.isHighlighted = false;
-            for (const auto &comp : components)
-            {
-                float left = comp.position.x - EPSILON;
-                float right = comp.position.x + comp.width + EPSILON;
-                float top = comp.position.y - EPSILON;
-                float bottom = comp.position.y + comp.height + EPSILON;
-
-                if (node.point.x >= left && node.point.x <= right &&
-                    node.point.y >= top && node.point.y <= bottom)
-                {
-                    node.isHighlighted = true;
-                    break;
-                }
-            }
         }
     }
 

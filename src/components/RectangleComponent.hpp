@@ -21,15 +21,31 @@ namespace components
             shape.setPoint(3, {0.f, size.y});
             shape.setFillColor(color);
 
-            setOriginToBottomLeft();
+            //setOriginToBottomLeft();
             if (auto node = grid.findClosestNode(position))
             {
                 setPosition({node->point.x, node->point.y});
+                std::cout<<"Placed rectangle at node (" << node->point.x << ", " << node->point.y << ")\n";
             }
             else
             {
                 std::cout<<"No node found for position (" << position.x << ", " << position.y << ")\n";
                 setPosition(position);
+            }
+            for(std::size_t i = 0; i < shape.getPointCount(); ++i)
+            {
+                sf::Vector2f pt = shape.getPoint(i);
+                if(auto node = grid.findClosestNode(pt + shape.getPosition()))
+                {
+                    std::cout << "Point " << i << ": (" << pt.x + shape.getPosition().x << ", " << pt.y + shape.getPosition().y << ")"
+                              << " closest node: (" << node->point.x << ", " << node->point.y << ")\n";
+                              shape.setPoint(i, {node->point.x - shape.getPosition().x, node->point.y - shape.getPosition().y});
+                }
+                else
+                {
+                    std::cout << "Point " << i << ": (" << pt.x + shape.getPosition().x << ", " << pt.y + shape.getPosition().y << ")"
+                              << " no closest node found\n";
+                }
             }
         }
         RectangleComponent(grid::Grid &grid, sf::Vector2f position, sf::Color color)
@@ -42,15 +58,32 @@ namespace components
             shape.setPoint(3, {20.f, 80.f});
             shape.setFillColor(color);
 
-            setOriginToBottomLeft();
+            //setOriginToBottomLeft();
             if (auto node = grid.findClosestNode(position))
             {
                 setPosition({node->point.x, node->point.y});
+                std::cout<<"Placed rectangle at node (" << node->point.x << ", " << node->point.y << ")\n";
             }
             else
             {
                 std::cout<<"No node found for position (" << position.x << ", " << position.y << ")\n";
                 setPosition(position);
+            }
+
+            for(std::size_t i = 0; i < shape.getPointCount(); ++i)
+            {
+                sf::Vector2f pt = shape.getPoint(i);
+                if(auto node = grid.findClosestNode(pt + shape.getPosition()))
+                {
+                    std::cout << "Point " << i << ": (" << pt.x + shape.getPosition().x << ", " << pt.y + shape.getPosition().y << ")"
+                              << " closest node: (" << node->point.x << ", " << node->point.y << ")\n";
+                              shape.setPoint(i, {node->point.x - shape.getPosition().x, node->point.y - shape.getPosition().y});
+                }
+                else
+                {
+                    std::cout << "Point " << i << ": (" << pt.x + shape.getPosition().x << ", " << pt.y + shape.getPosition().y << ")"
+                              << " no closest node found\n";
+                }
             }
         }
 

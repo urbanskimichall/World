@@ -44,7 +44,7 @@ inline bool convexPolygonsIntersect(const std::vector<sf::Vector2f> &A,
             projectPolygon(poly1, axis, minA, maxA);
             projectPolygon(poly2, axis, minB, maxB);
 
-            constexpr float EPSILON = -grid::GRID_SPACING / 3.f;
+            constexpr float EPSILON = -grid::GRID_SPACING / 15.f;
 
             if (maxA < minB - EPSILON || maxB < minA - EPSILON)
                 return false;

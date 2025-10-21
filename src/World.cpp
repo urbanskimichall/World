@@ -70,11 +70,11 @@ void World::create()
         window.clear();
         window.setView(fixedView);
         componentManager.draw(window);
-        grid.findPoint(mouseWorld);
-        for (const auto &comp : componentManager.getComponents())
-        {
-            comp->detectPointsOnComponent(componentManager.getComponents());
-        }
+        //grid.findPoint(mouseWorld);
+        // for (const auto &comp : componentManager.getComponents())
+        // {
+        //     comp->detectPointsOnComponent(componentManager.getComponents());
+        // }
 
         grid.draw(window);
         // window.draw(shape);

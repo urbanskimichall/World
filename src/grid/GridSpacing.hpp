@@ -3,7 +3,7 @@
 
 namespace grid
 {
-    constexpr float GRID_SPACING = 20.0f;
+    constexpr float GRID_SPACING = 25.0f;
     constexpr float MIN_GRID_SPACING = 5.0f;
     constexpr float MAX_GRID_SPACING = 50.0f;
 

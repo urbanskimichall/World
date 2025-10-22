@@ -1,6 +1,5 @@
 #include "World.hpp"
 #include "components/RectangleComponent.hpp"
-#include "components/QuadrangleComponent.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -11,9 +10,30 @@ void World::create()
     shape.setFillColor(sf::Color::Green);
     window.setFramerateLimit(60);
 
-    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 50.f}, sf::Vector2f{100.f, 50.f}, sf::Color::Green);
-    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 250.f}, sf::Vector2f{200.f, 50.f}, sf::Color::Yellow);
-    componentManager.emplaceComponent<components::RectangleComponent>(grid, sf::Vector2f{100.f, 250.f}, sf::Color::Cyan);
+    std::array<sf::Vector2f, 4> rectanglePoints = {
+        sf::Vector2f(50.f, 50.f),
+        sf::Vector2f(200.f, 50.f),
+        sf::Vector2f(200.f, 150.f),
+        sf::Vector2f(50.f, 150.f)
+    };
+
+    std::array<sf::Vector2f, 4> parallerogramPoints1 = {
+        sf::Vector2f(200.f, 200.f),
+        sf::Vector2f(320.f, 200.f),
+        sf::Vector2f(340.f, 280.f),
+        sf::Vector2f(220.f, 280.f)
+    };
+
+    std::array<sf::Vector2f, 4> parallerogramPoints2 = {
+        sf::Vector2f(400.f, 200.f),
+        sf::Vector2f(520.f, 200.f),
+        sf::Vector2f(540.f, 280.f),
+        sf::Vector2f(420.f, 280.f)
+    };
+
+    componentManager.emplaceComponent<components::RectangleComponent>(grid,rectanglePoints, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid,parallerogramPoints1, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid,parallerogramPoints2, sf::Color::Green);
 
     sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
 

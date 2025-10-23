@@ -4,6 +4,7 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 #include "../utils/Point.hpp"
+#include <iostream>
 
 namespace grid
 {
@@ -17,10 +18,19 @@ namespace grid
             Point point;
             bool isHighlighted = false;
             std::vector<Node *> neighbors;
+            std::vector<Node *> rightNeighbors;
             double distanceOnYAxis(const Node &other) const
             {
                 return std::abs(point.y - other.point.y);
             }
+        };
+
+        struct Rhombus
+        {
+            Point a;
+            Point b;
+            Point c;
+            Point d;
         };
 
         Grid(uint32_t rows, double spacing = 5.0) : rows(rows), spacing(spacing)
@@ -61,14 +71,58 @@ namespace grid
             return closestNode;
         }
 
+        void generateRhombi(uint32_t numRows, uint32_t numCols)
+        {
+            rhombi.clear();
+
+            for (const auto &node : gridNodes)
+            {
+                if (node.rightNeighbors.size() < 3)
+                {
+                    continue;
+                }
+                if (node.rightNeighbors.size() > 4)
+                {
+                    std::cerr << "Warning: Node has more than 4 right neighbors, skipping rhombus generation for this node.\n";
+                }
+
+                Rhombus rh;
+                rh.a = node.point;
+                rh.b = node.rightNeighbors[0]->point;
+                rh.c = node.rightNeighbors[1]->point;
+                rh.d = node.rightNeighbors[2]->point;
+                rhombi.push_back(rh);
+            }
+        }
+
+        void drawRhombi(sf::RenderWindow &window) const
+        {
+            for (const auto &rh : rhombi)
+            {
+                sf::ConvexShape diamond;
+                diamond.setPointCount(4);
+                diamond.setPoint(0, sf::Vector2f(rh.a.x, rh.a.y));
+                diamond.setPoint(1, sf::Vector2f(rh.b.x, rh.b.y));
+                diamond.setPoint(2, sf::Vector2f(rh.c.x, rh.c.y));
+                diamond.setPoint(3, sf::Vector2f(rh.d.x, rh.d.y));
+
+                diamond.setFillColor(sf::Color(0, 0, 255, 30)); // translucent blue
+                diamond.setOutlineColor(sf::Color::Blue);
+                diamond.setOutlineThickness(1.f);
+
+                window.draw(diamond);
+            }
+        }
+
     private:
         void generateGrid();
-        void generateGridPoints(uint32_t numRows, uint32_t numCols);
+        void generateGridPoints(uint32_t numRows, uint32_t numCols, double diagX, double diagY);
         void generateGridLines(uint32_t numRows, uint32_t numCols);
 
         uint32_t rows;
         double spacing;
         std::vector<Node> gridNodes;
+        std::vector<Rhombus> rhombi;
         sf::VertexArray lines{sf::PrimitiveType::Lines};
         std::optional<Point> highlightedPoint;
     };

@@ -22,6 +22,7 @@ namespace grid
             // window.draw(lines);
             window.draw(shape);
         }
+        drawRhombi(window);
     }
 
     void Grid::findPoint(const sf::Vector2f &mousePos)
@@ -65,6 +66,13 @@ namespace grid
             node.point.x += delta.x;
             node.point.y += delta.y;
         }
+        for(auto &rh : rhombi)
+        {
+            rh.a.x += delta.x; rh.a.y += delta.y;
+            rh.b.x += delta.x; rh.b.y += delta.y;
+            rh.c.x += delta.x; rh.c.y += delta.y;
+            rh.d.x += delta.x; rh.d.y += delta.y;
+        }
     }
 
     float Grid::adjustPositionToGrid(float length) const
@@ -82,31 +90,36 @@ namespace grid
         int numRows = static_cast<int>(areaSize / spacing);
         int numCols = numRows;
 
-        generateGridPoints(numRows, numCols);
+        generateGridPoints(numRows, numCols, 50 * 2, 25); // Using diagX=12.0 and diagY=6.0 for hex grid
         for (auto &node : gridNodes)
         {
             std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
+            for(auto* neighbor : node.rightNeighbors)
+            {
+                std::cout << "  Right neoghbour at (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
+            }
         }
+        generateRhombi(numRows, numCols);
 
         generateGridLines(numRows, numCols);
     }
 
-    void Grid::generateGridPoints(uint32_t numRows, uint32_t numCols)
+    void Grid::generateGridPoints(uint32_t numRows, uint32_t numCols,
+                                  double diagX, double diagY)
     {
         gridNodes.clear();
+
         for (uint32_t row = 0; row < numRows; ++row)
         {
-            double y = row * spacing * std::sqrt(3) / 2.0;
+            double y = row * (diagY / 2.0);
             for (uint32_t col = 0; col < numCols; ++col)
             {
-                double x = col * spacing + (row % 2 == 1 ? spacing / 2.0 : 0.0);
+                double x = col * (diagX / 2.0) + ((row % 2) ? diagX / 4.0 : 0.0);
                 gridNodes.emplace_back(Node{.point = {x, y}});
             }
         }
 
-        // to be refactored
-        //  Establish neighbors for each node in the triangular grid
-
+        // Establish neighbor connections (like before)
         auto index = [numCols](int r, int c)
         { return r * numCols + c; };
 
@@ -115,8 +128,8 @@ namespace grid
             for (uint32_t col = 0; col < numCols; ++col)
             {
                 Node &node = gridNodes[index(row, col)];
+                node.neighbors.clear();
 
-                // Offsets depend on whether the row is even or odd
                 std::vector<std::pair<int, int>> neighborOffsets;
                 if (row % 2 == 0)
                 {
@@ -129,19 +142,37 @@ namespace grid
                         {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}};
                 }
 
-                // Add valid neighbors
                 for (auto [dr, dc] : neighborOffsets)
                 {
-                    int nr = row + dr;
-                    int nc = col + dc;
-
-                    if (nr >= 0 && nr < numRows && nc >= 0 && nc < numCols)
+                    int nr = static_cast<int>(row) + dr;
+                    int nc = static_cast<int>(col) + dc;
+                    if (nr >= 0 && nr < static_cast<int>(numRows) &&
+                        nc >= 0 && nc < static_cast<int>(numCols))
+                    {
                         node.neighbors.push_back(&gridNodes[index(nr, nc)]);
+                    }
                 }
             }
         }
-    }
 
+        for (auto &node : gridNodes)
+        {
+            std::vector<Node *> rightSideNeighbors;
+
+            for (Node *n : node.neighbors)
+            {
+                if (n->point.x >= node.point.x)
+                    rightSideNeighbors.push_back(n);
+            }
+
+            // Optionally keep only up to 3 right-side neighbors
+            if (rightSideNeighbors.size() > 3)
+                rightSideNeighbors.resize(3);
+
+            // Store them somewhere, e.g.:
+            node.rightNeighbors = rightSideNeighbors;
+        }
+    }
     void Grid::generateGridLines(uint32_t numRows, uint32_t numCols)
     {
         lines.clear();

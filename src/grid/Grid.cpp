@@ -1,5 +1,6 @@
 #include "Grid.hpp"
 #include "GridSpacing.hpp"
+#include "AreaSelector.hpp"
 #include <SFML/Graphics.hpp>
 #include <limits>
 #include <iostream>
@@ -66,12 +67,42 @@ namespace grid
             node.point.x += delta.x;
             node.point.y += delta.y;
         }
-        for(auto &rh : rhombi)
+        for (auto &rh : rhombi)
         {
-            rh.a.x += delta.x; rh.a.y += delta.y;
-            rh.b.x += delta.x; rh.b.y += delta.y;
-            rh.c.x += delta.x; rh.c.y += delta.y;
-            rh.d.x += delta.x; rh.d.y += delta.y;
+            rh.a.x += delta.x;
+            rh.a.y += delta.y;
+            rh.b.x += delta.x;
+            rh.b.y += delta.y;
+            rh.c.x += delta.x;
+            rh.c.y += delta.y;
+            rh.d.x += delta.x;
+            rh.d.y += delta.y;
+        }
+    }
+
+    void Grid::highlightRhombusUnderMouse(const sf::Vector2f &mousePos)
+    {
+        for (uint32_t i = 0; i < rhombi.size(); ++i)
+        {
+            const Rhombus &r = rhombi[i];
+            if (AreaSelector::pointInConvexQuad(r, mousePos))
+            {
+                highlightedRhombiIndex = i;
+                break;
+            }
+        }
+    }
+
+    void Grid::selectRhombusAtMouse(const sf::Vector2f &mousePos)
+    {
+        for (uint32_t i = 0; i < rhombi.size(); ++i)
+        {
+            const Rhombus &r = rhombi[i];
+            if (AreaSelector::pointInConvexQuad(r, mousePos))
+            {
+                selectedRhombiIndices.push_back(i);
+                break;
+            }
         }
     }
 
@@ -94,7 +125,7 @@ namespace grid
         for (auto &node : gridNodes)
         {
             std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
-            for(auto* neighbor : node.rightNeighbors)
+            for (auto *neighbor : node.rightNeighbors)
             {
                 std::cout << "  Right neoghbour at (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
             }
@@ -216,5 +247,41 @@ namespace grid
             }
         }
     }
+    void Grid::drawRhombi(sf::RenderWindow &window) const
+    {
+        for (uint32_t i = 0; i < rhombi.size(); ++i)
+        {
+            const Rhombus &rh = rhombi[i];
+            sf::ConvexShape diamond;
+            diamond.setPointCount(4);
+            diamond.setPoint(0, sf::Vector2f(rh.a.x, rh.a.y));
+            diamond.setPoint(1, sf::Vector2f(rh.b.x, rh.b.y));
+            diamond.setPoint(2, sf::Vector2f(rh.c.x, rh.c.y));
+            diamond.setPoint(3, sf::Vector2f(rh.d.x, rh.d.y));
 
+            if (i == highlightedRhombiIndex)
+            {
+                diamond.setFillColor(sf::Color(255, 0, 0, 50));
+                diamond.setOutlineColor(sf::Color::Red);
+                diamond.setOutlineThickness(2.f);
+            }
+            else
+            {
+                diamond.setFillColor(sf::Color(0, 0, 255, 30));
+                diamond.setOutlineColor(sf::Color::Blue);
+                diamond.setOutlineThickness(1.f);
+            }
+            for (const uint32_t index : selectedRhombiIndices)
+            {
+                if (i == index)
+                {
+                    diamond.setFillColor(sf::Color(0, 255, 0, 100));
+                    diamond.setOutlineColor(sf::Color::Green);
+                    diamond.setOutlineThickness(2.f);
+                }
+            }
+
+            window.draw(diamond);
+        }
+    }
 }

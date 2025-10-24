@@ -62,6 +62,12 @@ void World::create()
                     isPanning = true;
                     std::cout << "Started panning\n";
                     lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    
+                }
+                else if (mouse->button == sf::Mouse::Button::Left)
+                {
+                    const sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    grid.selectRhombusAtMouse(mouseWorld);
                 }
             }
             // Stop panning
@@ -95,7 +101,7 @@ void World::create()
         // {
         //     comp->detectPointsOnComponent(componentManager.getComponents());
         // }
-
+        grid.highlightRhombusUnderMouse(mouseWorld);
         grid.draw(window);
         // window.draw(shape);
         window.display();

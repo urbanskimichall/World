@@ -106,6 +106,19 @@ namespace grid
         }
     }
 
+    void Grid::unselectRhombusAtMouse(const sf::Vector2f &mousePos)
+    {
+        for (uint32_t i = 0; i < rhombi.size(); ++i)
+        {
+            const Rhombus &r = rhombi[i];
+            if (AreaSelector::pointInConvexQuad(r, mousePos))
+            {
+                selectedRhombiIndices.erase(std::remove(selectedRhombiIndices.begin(), selectedRhombiIndices.end(), i), selectedRhombiIndices.end());
+                break;
+            }
+        }
+    }
+
     float Grid::adjustPositionToGrid(float length) const
     {
         return length / spacing * gridNodes.front().neighbors.front()->point.distanceTo(gridNodes.front().point);

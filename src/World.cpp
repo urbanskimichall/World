@@ -14,26 +14,23 @@ void World::create()
         sf::Vector2f(50.f, 50.f),
         sf::Vector2f(200.f, 50.f),
         sf::Vector2f(200.f, 150.f),
-        sf::Vector2f(50.f, 150.f)
-    };
+        sf::Vector2f(50.f, 150.f)};
 
     std::array<sf::Vector2f, 4> parallerogramPoints1 = {
         sf::Vector2f(200.f, 200.f),
         sf::Vector2f(320.f, 200.f),
         sf::Vector2f(340.f, 280.f),
-        sf::Vector2f(220.f, 280.f)
-    };
+        sf::Vector2f(220.f, 280.f)};
 
     std::array<sf::Vector2f, 4> parallerogramPoints2 = {
         sf::Vector2f(400.f, 200.f),
         sf::Vector2f(520.f, 200.f),
         sf::Vector2f(540.f, 280.f),
-        sf::Vector2f(420.f, 280.f)
-    };
+        sf::Vector2f(420.f, 280.f)};
 
-    componentManager.emplaceComponent<components::RectangleComponent>(grid,rectanglePoints, sf::Color::Green);
-    componentManager.emplaceComponent<components::RectangleComponent>(grid,parallerogramPoints1, sf::Color::Green);
-    componentManager.emplaceComponent<components::RectangleComponent>(grid,parallerogramPoints2, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
+    componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
     sf::View fixedView(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
 
@@ -62,7 +59,7 @@ void World::create()
                     isPanning = true;
                     std::cout << "Started panning\n";
                     lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    
+                    grid.unselectRhombusAtMouse(lastMousePos);
                 }
                 else if (mouse->button == sf::Mouse::Button::Left)
                 {
@@ -96,11 +93,11 @@ void World::create()
         window.clear();
         window.setView(fixedView);
         componentManager.draw(window);
-        //grid.findPoint(mouseWorld);
-        // for (const auto &comp : componentManager.getComponents())
-        // {
-        //     comp->detectPointsOnComponent(componentManager.getComponents());
-        // }
+        // grid.findPoint(mouseWorld);
+        //  for (const auto &comp : componentManager.getComponents())
+        //  {
+        //      comp->detectPointsOnComponent(componentManager.getComponents());
+        //  }
         grid.highlightRhombusUnderMouse(mouseWorld);
         grid.draw(window);
         // window.draw(shape);

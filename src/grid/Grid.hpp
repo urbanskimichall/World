@@ -90,6 +90,7 @@ namespace grid
         void drawRhombi(sf::RenderWindow &window) const;
         void highlightRhombusUnderMouse(const sf::Vector2f &mousePos);
         void selectRhombusAtMouse(const sf::Vector2f &mousePos);
+        void unselectRhombusAtMouse(const sf::Vector2f &mousePos);
 
     private:
         void generateGrid();

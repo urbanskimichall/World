@@ -18,4 +18,5 @@ private:
 
     bool isPanning = false;
     sf::Vector2f lastMousePos;
+    sf::Vector2i lastMousePixel;
 };

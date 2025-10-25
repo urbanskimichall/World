@@ -4,6 +4,7 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 #include "Rhombus.hpp"
+#include "Node.hpp"
 #include "../utils/Point.hpp"
 #include <iostream>
 
@@ -13,18 +14,6 @@ namespace grid
     {
     public:
         using Point = utils::Point;
-
-        struct Node
-        {
-            Point point;
-            bool isHighlighted = false;
-            std::vector<Node *> neighbors;
-            std::vector<Node *> rightNeighbors;
-            double distanceOnYAxis(const Node &other) const
-            {
-                return std::abs(point.y - other.point.y);
-            }
-        };
 
         Grid(uint32_t rows, double spacing = 5.0) : rows(rows), spacing(spacing)
         {
@@ -40,9 +29,9 @@ namespace grid
         void moveAllNodes(const sf::Vector2f &delta);
         float adjustPositionToGrid(float length) const;
 
-        const grid::Grid::Node *findClosestNode(const sf::Vector2f &position) const
+        const grid::Node *findClosestNode(const sf::Vector2f &position) const
         {
-            const grid::Grid::Node *closestNode = nullptr;
+            const grid::Node *closestNode = nullptr;
             float minDistance = std::numeric_limits<float>::max();
             if (gridNodes.empty())
             {

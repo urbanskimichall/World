@@ -8,7 +8,7 @@
 
 namespace components
 {
-    using Node = grid::Grid::Node;
+    using Node = grid::Node;
     // TODO make Component an abstract base class
     class Component
     {
@@ -37,7 +37,7 @@ namespace components
         virtual void setPosition(const sf::Vector2f &position) { rectangle.setPosition(position); }
 
     protected:
-        const grid::Grid::Node *findClosestNode(const sf::Vector2f &position) const;
+        const grid::Node *findClosestNode(const sf::Vector2f &position) const;
 
     private:
         std::vector<sf::Vector2f> getTransformedPoints() const;

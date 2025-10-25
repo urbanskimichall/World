@@ -55,9 +55,9 @@ namespace components
         target.draw(rectangle);
     }
 
-    const grid::Grid::Node *Component::findClosestNode(const sf::Vector2f &position) const
+    const grid::Node *Component::findClosestNode(const sf::Vector2f &position) const
     {
-        const grid::Grid::Node *closestNode = nullptr;
+        const grid::Node *closestNode = nullptr;
         float minDistance = std::numeric_limits<float>::max();
         const auto gridNodes = grid.getGridNodes();
         if (gridNodes.empty())

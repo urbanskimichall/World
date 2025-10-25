@@ -134,7 +134,7 @@ namespace grid
         int numRows = static_cast<int>(areaSize / spacing);
         int numCols = numRows;
 
-        generateGridPoints(numRows, numCols, 50 * 2, 25); // Using diagX=12.0 and diagY=6.0 for hex grid
+        generateGridPoints(numRows, numCols, RHOMBUS_DIAG_X, RHOMBUS_DIAG_Y);
         for (auto &node : gridNodes)
         {
             std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
@@ -211,7 +211,9 @@ namespace grid
 
             // Optionally keep only up to 3 right-side neighbors
             if (rightSideNeighbors.size() > 3)
+            {
                 rightSideNeighbors.resize(3);
+            }
 
             // Store them somewhere, e.g.:
             node.rightNeighbors = rightSideNeighbors;

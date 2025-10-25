@@ -10,13 +10,4 @@ class World
 {
 public:
     void create();
-
-private:
-    void moveWorld(const sf::Vector2f &delta);
-    grid::Grid grid{grid::numOfRows, grid::GRID_SPACING};
-    components::ComponentManager componentManager{};
-
-    bool isPanning = false;
-    sf::Vector2f lastMousePos;
-    sf::Vector2i lastMousePixel;
 };

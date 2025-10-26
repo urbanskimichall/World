@@ -20,7 +20,7 @@ namespace grid
             generateGrid();
         }
 
-        void draw(sf::RenderWindow &window) const;
+        void draw(sf::RenderWindow &window, sf::FloatRect bounds) const;
         void findPoint(const sf::Vector2f &mousePos);
         const std::vector<Node> &getGridNodes() const { return gridNodes; }
         std::vector<Node> &getGridNodes() { return gridNodes; }
@@ -76,7 +76,6 @@ namespace grid
                 rhombi.push_back(rh);
             }
         }
-        void drawRhombi(sf::RenderWindow &window) const;
         void highlightRhombusUnderMouse(const sf::Vector2f &mousePos);
         void selectRhombusAtMouse(const sf::Vector2f &mousePos);
         void unselectRhombusAtMouse(const sf::Vector2f &mousePos);
@@ -85,6 +84,7 @@ namespace grid
         void generateGrid();
         void generateGridPoints(uint32_t numRows, uint32_t numCols, double diagX, double diagY);
         void generateGridLines(uint32_t numRows, uint32_t numCols);
+        void drawRhombi(sf::RenderWindow &window, const sf::FloatRect& bounds) const;
 
         uint32_t rows;
         double spacing;

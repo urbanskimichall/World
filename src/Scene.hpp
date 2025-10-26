@@ -45,7 +45,9 @@ public:
     void draw(sf::RenderWindow &target) const
     {
         componentManager.draw(target);
-        grid.draw(target);
+        
+        sf::FloatRect bounds = getViewBounds(target);
+        grid.draw(target, bounds);
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -56,6 +58,16 @@ public:
     grid::Grid &getGrid() { return grid; }
 
 private:
+    sf::FloatRect getViewBounds(const sf::RenderWindow &window) const
+    {
+        sf::View view = window.getView();
+        float left = view.getCenter().x - view.getSize().x / 2.f;
+        float top = view.getCenter().y - view.getSize().y / 2.f;
+        float width = view.getSize().x;
+        float height = view.getSize().y;
+        return sf::FloatRect({left, top}, {width, height});
+    }
+
     grid::Grid grid;
     components::ComponentManager componentManager;
 };

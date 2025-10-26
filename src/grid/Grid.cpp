@@ -9,21 +9,24 @@
 
 namespace grid
 {
-    void Grid::draw(sf::RenderWindow &window) const
+    void Grid::draw(sf::RenderWindow &window, sf::FloatRect bounds) const
     {
+        sf::VertexArray points(sf::PrimitiveType::Points);
         for (const auto &node : gridNodes)
         {
-            sf::CircleShape shape(2.f); // radius 2 pixels
-            shape.setPosition({static_cast<float>(node.point.x), static_cast<float>(node.point.y)});
-            shape.setFillColor(sf::Color::Blue);
+            if (bounds.contains({node.point.x, node.point.y}) == false)
+            {
+                continue;
+            }
             if (node.isHighlighted)
             {
-                shape.setFillColor(sf::Color::Red);
+                points.append(sf::Vertex({node.point.x, node.point.y}, sf::Color::Red));
+                continue;
             }
-            // window.draw(lines);
-            window.draw(shape);
+            points.append(sf::Vertex({node.point.x, node.point.y}, sf::Color::Blue));
         }
-        drawRhombi(window);
+        window.draw(points);
+        drawRhombi(window, bounds);
     }
 
     void Grid::findPoint(const sf::Vector2f &mousePos)
@@ -135,14 +138,14 @@ namespace grid
         int numCols = numRows;
 
         generateGridPoints(numRows, numCols, RHOMBUS_DIAG_X, RHOMBUS_DIAG_Y);
-        for (auto &node : gridNodes)
-        {
-            std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
-            for (auto *neighbor : node.rightNeighbors)
-            {
-                std::cout << "  Right neoghbour at (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
-            }
-        }
+        // for (auto &node : gridNodes)
+        // {
+        //     std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
+        //     for (auto *neighbor : node.rightNeighbors)
+        //     {
+        //         std::cout << "  Right neoghbour at (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
+        //     }
+        // }
         generateRhombi(numRows, numCols);
 
         generateGridLines(numRows, numCols);
@@ -262,10 +265,24 @@ namespace grid
             }
         }
     }
-    void Grid::drawRhombi(sf::RenderWindow &window) const
+    void Grid::drawRhombi(sf::RenderWindow &window, const sf::FloatRect& bounds) const
     {
+        auto isRhombusVisible = [bounds](const Rhombus &r) -> bool 
+        {
+            return bounds.contains({r.a.x, r.a.y}) ||
+                   bounds.contains({r.b.x, r.b.y}) ||
+                   bounds.contains({r.c.x, r.c.y}) ||
+                   bounds.contains({r.d.x, r.d.y});
+        };
+        
+
         for (uint32_t i = 0; i < rhombi.size(); ++i)
         {
+            if(!isRhombusVisible(rhombi[i]))
+            {
+                continue;
+            }
+
             const Rhombus &rh = rhombi[i];
             sf::ConvexShape diamond;
             diamond.setPointCount(4);
@@ -286,6 +303,7 @@ namespace grid
                 diamond.setOutlineColor(sf::Color::Blue);
                 diamond.setOutlineThickness(1.f);
             }
+
             for (const uint32_t index : selectedRhombiIndices)
             {
                 if (i == index)

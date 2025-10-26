@@ -53,12 +53,6 @@ public:
         componentManager.handleEvent(event, window);
     }
 
-    void move(const sf::Vector2f &delta)
-    {
-        grid.moveAllNodes(delta);
-        componentManager.moveAllComponents(delta);
-    }
-
     grid::Grid &getGrid() { return grid; }
 
 private:

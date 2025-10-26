@@ -5,6 +5,7 @@
 #include "Scene.hpp"
 #include "ViewController.hpp"
 #include "EventHandler.hpp"
+#include "FpsCounter.hpp"
 
 void World::create()
 {
@@ -19,16 +20,21 @@ void World::create()
     scene.init();
     ViewController viewController(view);
     EventHandler eventHandler;
+    FpsCounter fpsCounter;
 
-     while (window.isOpen())
+    while (window.isOpen())
     {
         while (auto event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
+            {
                 window.close();
+            }
 
             eventHandler.handleEvent(*event, window, scene, viewController);
         }
+        fpsCounter.update();
+        window.setTitle("SFML 3 + C++23 - FPS: " + std::to_string(fpsCounter.getFps()) + "");
 
         scene.update(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 

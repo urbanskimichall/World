@@ -313,7 +313,10 @@ namespace grid
                     diamond.setOutlineThickness(2.f);
                 }
             }
-
+            sf::CircleShape centerDot(3.f);
+            centerDot.setFillColor(sf::Color::Yellow);
+            centerDot.setPosition({rh.center().x - 3.f, rh.center().y - 3.f});
+            window.draw(centerDot);
             window.draw(diamond);
         }
     }

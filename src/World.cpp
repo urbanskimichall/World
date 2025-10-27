@@ -6,6 +6,7 @@
 #include "ViewController.hpp"
 #include "EventHandler.hpp"
 #include "FpsCounter.hpp"
+#include "Logger.hpp"
 
 void World::create()
 {

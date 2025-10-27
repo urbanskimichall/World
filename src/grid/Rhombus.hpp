@@ -11,5 +11,9 @@ namespace grid
         Point b;
         Point c;
         Point d;
+        Point center() const
+        {
+            return Point((a.x + b.x + c.x + d.x) / 4.0, (a.y + b.y + c.y + d.y) / 4.0);
+        }
     };
 }

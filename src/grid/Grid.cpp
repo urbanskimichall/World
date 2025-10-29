@@ -6,9 +6,15 @@
 #include <iostream>
 #include <array>
 #include <algorithm>
+#include "../Logger.hpp"
 
 namespace grid
 {
+    inline bool samePoint(const utils::Point &p1, const utils::Point &p2, double eps = 0.001)
+    {
+        return std::abs(p1.x - p2.x) < eps && std::abs(p1.y - p2.y) < eps;
+    }
+
     void Grid::draw(sf::RenderWindow &window, sf::FloatRect bounds) const
     {
         sf::VertexArray points(sf::PrimitiveType::Points);
@@ -104,6 +110,15 @@ namespace grid
             if (AreaSelector::pointInConvexQuad(r, mousePos))
             {
                 selectedRhombiIndices.push_back(i);
+                LOG_INFO("Rhombus at index ", i, " selected, center at (", r.center().x, ", ", r.center().y, ")");
+                LOG_INFO("Distance centers of i-1 and i: ", (i > 0 ? rhombi[i - 1].center().distanceTo(r.center()) : 0.0));
+                LOG_INFO("Distance centers of i and i+1: ", (i + 1 < rhombi.size() ? rhombi[i + 1].center().distanceTo(r.center()) : 0.0));
+
+                for (const auto neighbourCenter : rhombusNeighbors[i])
+                {
+                    LOG_INFO("Rhombi neighbour x: ", neighbourCenter.x, " y: ", neighbourCenter.y);
+                }
+
                 break;
             }
         }
@@ -117,6 +132,7 @@ namespace grid
             if (AreaSelector::pointInConvexQuad(r, mousePos))
             {
                 selectedRhombiIndices.erase(std::remove(selectedRhombiIndices.begin(), selectedRhombiIndices.end(), i), selectedRhombiIndices.end());
+                LOG_INFO("Rhombus at index ", i, " unselected, center at (", r.center().x, ", ", r.center().y, ")");
                 break;
             }
         }
@@ -138,17 +154,36 @@ namespace grid
         int numCols = numRows;
 
         generateGridPoints(numRows, numCols, RHOMBUS_DIAG_X, RHOMBUS_DIAG_Y);
-        // for (auto &node : gridNodes)
-        // {
-        //     std::cout << "Node at (" << node.point.x << ", " << node.point.y << ")\n";
-        //     for (auto *neighbor : node.rightNeighbors)
-        //     {
-        //         std::cout << "  Right neoghbour at (" << neighbor->point.x << ", " << neighbor->point.y << ")\n";
-        //     }
-        // }
         generateRhombi(numRows, numCols);
-
         generateGridLines(numRows, numCols);
+    }
+
+    void Grid::generateRhombi(uint32_t numRows, uint32_t numCols)
+    {
+        LOG_INFO("Rhombi generation started");
+        rhombi.clear();
+        rhombusCenters.clear();
+        rhombusNeighbors.clear();
+
+        const float shift = static_cast<float>(25.f);
+
+        for (const auto &node : gridNodes)
+        {
+            auto maybeRh = generateSingleRhombus(node);
+            if (!maybeRh.has_value())
+            {
+                continue;
+            }
+
+            const Rhombus &rh = *maybeRh;
+            const Point center = rh.center();
+
+            rhombi.push_back(rh);
+            rhombusCenters.emplace_back(center.x, center.y);
+
+            auto neighborCenters = generateNeighbourCenters(center, shift);
+            rhombusNeighbors.push_back(std::move(neighborCenters));
+        }
     }
 
     void Grid::generateGridPoints(uint32_t numRows, uint32_t numCols,
@@ -265,20 +300,51 @@ namespace grid
             }
         }
     }
-    void Grid::drawRhombi(sf::RenderWindow &window, const sf::FloatRect& bounds) const
+    std::vector<Point> Grid::generateNeighbourCenters(const Point &center, float shift)
     {
-        auto isRhombusVisible = [bounds](const Rhombus &r) -> bool 
+        std::vector<Point> neighbors;
+        neighbors.reserve(8);
+
+        for (const auto &dir : DIRECTION_OFFSETS)
+        {
+            neighbors.emplace_back(center.x + dir.x * shift, center.y + dir.y * shift);
+        }
+
+        return neighbors;
+    }
+
+    std::optional<Rhombus> Grid::generateSingleRhombus(const Node &node)
+    {
+        if (node.rightNeighbors.size() < 3)
+            return std::nullopt;
+
+        if (node.rightNeighbors.size() > 4)
+        {
+            std::cerr << "Warning: Node has more than 4 right neighbors, skipping rhombus generation.\n";
+            return std::nullopt;
+        }
+
+        Rhombus rh;
+        rh.a = node.point;
+        rh.b = node.rightNeighbors[0]->point;
+        rh.c = node.rightNeighbors[1]->point;
+        rh.d = node.rightNeighbors[2]->point;
+        return rh;
+    }
+    
+    void Grid::drawRhombi(sf::RenderWindow &window, const sf::FloatRect &bounds) const
+    {
+        auto isRhombusVisible = [bounds](const Rhombus &r) -> bool
         {
             return bounds.contains({r.a.x, r.a.y}) ||
                    bounds.contains({r.b.x, r.b.y}) ||
                    bounds.contains({r.c.x, r.c.y}) ||
                    bounds.contains({r.d.x, r.d.y});
         };
-        
 
         for (uint32_t i = 0; i < rhombi.size(); ++i)
         {
-            if(!isRhombusVisible(rhombi[i]))
+            if (!isRhombusVisible(rhombi[i]))
             {
                 continue;
             }
@@ -315,7 +381,7 @@ namespace grid
             }
             sf::CircleShape centerDot(3.f);
             centerDot.setFillColor(sf::Color::Yellow);
-            centerDot.setPosition({rh.center().x - 3.f, rh.center().y - 3.f});
+            centerDot.setPosition({rhombusCenters[i].x - 3.f, rhombusCenters[i].y - 3.f});
             window.draw(centerDot);
             window.draw(diamond);
         }

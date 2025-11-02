@@ -25,7 +25,7 @@ namespace components
             sf::Vector2f offset = newOrigin - oldOrigin;
             rectangle.setOrigin(newOrigin);
             rectangle.setPosition(oldPos + offset);
-            length = utils::roundUpToMultiple(length, (grid.getSpacing()));
+            //length = utils::roundUpToMultiple(length, (grid.getSpacing()));
             const auto distanceToRightNeighbor = node->distanceOnYAxis(*node->neighbors[1]);
             height = utils::roundUpToMultiple(height, (distanceToRightNeighbor));
             rectangle.setSize({static_cast<float>(length), static_cast<float>(height)});

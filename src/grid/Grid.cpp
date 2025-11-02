@@ -1,389 +1,49 @@
 #include "Grid.hpp"
-#include "GridSpacing.hpp"
-#include "AreaSelector.hpp"
-#include <SFML/Graphics.hpp>
-#include <limits>
-#include <iostream>
-#include <array>
-#include <algorithm>
-#include "../Logger.hpp"
 
 namespace grid
 {
-    inline bool samePoint(const utils::Point &p1, const utils::Point &p2, double eps = 0.001)
+    Grid::Grid(uint32_t rows, uint32_t cols, double spacing)
+        : generator(spacing)
     {
-        return std::abs(p1.x - p2.x) < eps && std::abs(p1.y - p2.y) < eps;
+        generate(rows, cols);
     }
 
-    void Grid::draw(sf::RenderWindow &window, sf::FloatRect bounds) const
+    void Grid::generate(uint32_t rows, uint32_t cols)
     {
-        sf::VertexArray points(sf::PrimitiveType::Points);
-        for (const auto &node : gridNodes)
-        {
-            if (bounds.contains({node.point.x, node.point.y}) == false)
-            {
-                continue;
-            }
-            if (node.isHighlighted)
-            {
-                points.append(sf::Vertex({node.point.x, node.point.y}, sf::Color::Red));
-                continue;
-            }
-            points.append(sf::Vertex({node.point.x, node.point.y}, sf::Color::Blue));
-        }
-        window.draw(points);
-        drawRhombi(window, bounds);
+        LOG_INFO("Generating grid ", rows, "x", cols);
+        model = generator.generate(rows, cols);
+        selectedRhombi.clear();
+        highlightedIndex = UINT32_MAX;
     }
 
-    void Grid::findPoint(const sf::Vector2f &mousePos)
+    void Grid::draw(sf::RenderWindow &window, const sf::FloatRect &viewBounds) const
     {
-        utils::Point mousePoint(mousePos.x, mousePos.y);
-        double minDist = std::numeric_limits<double>::max();
-        std::array<std::pair<Point, double>, 4> dists{{{Point(0, 0), minDist}, {Point(0, 0), minDist}, {Point(0, 0), minDist}, {Point(0, 0), minDist}}};
+        renderer.draw(model, window, viewBounds);
+        renderer.drawRhombi(model, window, viewBounds, highlightedIndex, selectedRhombi);
+    }
 
-        for (auto &node : gridNodes)
+    void Grid::handleMouseClick(const sf::Vector2f &worldPos, bool toggle)
+    {
+        uint32_t rhIndex = selector.findRhombusUnderMouse(model, worldPos);
+        if (rhIndex == UINT32_MAX)
         {
-            node.isHighlighted = false;
-            double dist = node.point.distanceTo(mousePoint);
-            for (auto &[p, d] : dists)
-            {
-                if (dist < d)
-                {
-                    d = dist;
-                    p = node.point;
-                    break;
-                }
-            }
-            if (dist < minDist)
-            {
-                minDist = dist;
-                highlightedPoint = node.point;
-            }
+            highlightedIndex = UINT32_MAX;
+            return;
         }
 
+        highlightedIndex = rhIndex;
+        if (toggle)
+            selector.toggleSelection(selectedRhombi, rhIndex);
+        else
         {
-            // std::cout << "Point: (" << p.x << ", " << p.y << ") Distance: " << d << "\n";
-            std::find_if(gridNodes.begin(), gridNodes.end(), [this](const Node &n)
-                         { return n.point == *highlightedPoint; })
-                ->isHighlighted = true;
+            selectedRhombi.clear();
+            selectedRhombi.push_back(rhIndex);
         }
     }
 
-    void Grid::moveAllNodes(const sf::Vector2f &delta)
+    void Grid::clearSelection()
     {
-        for (auto &node : gridNodes)
-        {
-            node.point.x += delta.x;
-            node.point.y += delta.y;
-        }
-        for (auto &rh : rhombi)
-        {
-            rh.a.x += delta.x;
-            rh.a.y += delta.y;
-            rh.b.x += delta.x;
-            rh.b.y += delta.y;
-            rh.c.x += delta.x;
-            rh.c.y += delta.y;
-            rh.d.x += delta.x;
-            rh.d.y += delta.y;
-        }
-    }
-
-    void Grid::highlightRhombusUnderMouse(const sf::Vector2f &mousePos)
-    {
-        for (uint32_t i = 0; i < rhombi.size(); ++i)
-        {
-            const Rhombus &r = rhombi[i];
-            if (AreaSelector::pointInConvexQuad(r, mousePos))
-            {
-                highlightedRhombiIndex = i;
-                break;
-            }
-        }
-    }
-
-    void Grid::selectRhombusAtMouse(const sf::Vector2f &mousePos)
-    {
-        for (uint32_t i = 0; i < rhombi.size(); ++i)
-        {
-            const Rhombus &r = rhombi[i];
-            if (AreaSelector::pointInConvexQuad(r, mousePos))
-            {
-                selectedRhombiIndices.push_back(i);
-                LOG_INFO("Rhombus at index ", i, " selected, center at (", r.center().x, ", ", r.center().y, ")");
-                LOG_INFO("Distance centers of i-1 and i: ", (i > 0 ? rhombi[i - 1].center().distanceTo(r.center()) : 0.0));
-                LOG_INFO("Distance centers of i and i+1: ", (i + 1 < rhombi.size() ? rhombi[i + 1].center().distanceTo(r.center()) : 0.0));
-
-                for (const auto neighbourCenter : rhombusNeighbors[i])
-                {
-                    LOG_INFO("Rhombi neighbour x: ", neighbourCenter.x, " y: ", neighbourCenter.y);
-                }
-
-                break;
-            }
-        }
-    }
-
-    void Grid::unselectRhombusAtMouse(const sf::Vector2f &mousePos)
-    {
-        for (uint32_t i = 0; i < rhombi.size(); ++i)
-        {
-            const Rhombus &r = rhombi[i];
-            if (AreaSelector::pointInConvexQuad(r, mousePos))
-            {
-                selectedRhombiIndices.erase(std::remove(selectedRhombiIndices.begin(), selectedRhombiIndices.end(), i), selectedRhombiIndices.end());
-                LOG_INFO("Rhombus at index ", i, " unselected, center at (", r.center().x, ", ", r.center().y, ")");
-                break;
-            }
-        }
-    }
-
-    float Grid::adjustPositionToGrid(float length) const
-    {
-        return length / spacing * gridNodes.front().neighbors.front()->point.distanceTo(gridNodes.front().point);
-    }
-
-    void Grid::generateGrid()
-    {
-        gridNodes.clear();
-
-        // Estimate number of rows and columns to fill a square area
-        // Assume square area of (rows_ * spacing_) x (rows_ * spacing_)
-        double areaSize = rows * spacing;
-        int numRows = static_cast<int>(areaSize / spacing);
-        int numCols = numRows;
-
-        generateGridPoints(numRows, numCols, RHOMBUS_DIAG_X, RHOMBUS_DIAG_Y);
-        generateRhombi(numRows, numCols);
-        generateGridLines(numRows, numCols);
-    }
-
-    void Grid::generateRhombi(uint32_t numRows, uint32_t numCols)
-    {
-        LOG_INFO("Rhombi generation started");
-        rhombi.clear();
-        rhombusCenters.clear();
-        rhombusNeighbors.clear();
-
-        const float shift = static_cast<float>(25.f);
-
-        for (const auto &node : gridNodes)
-        {
-            auto maybeRh = generateSingleRhombus(node);
-            if (!maybeRh.has_value())
-            {
-                continue;
-            }
-
-            const Rhombus &rh = *maybeRh;
-            const Point center = rh.center();
-
-            rhombi.push_back(rh);
-            rhombusCenters.emplace_back(center.x, center.y);
-
-            auto neighborCenters = generateNeighbourCenters(center, shift);
-            rhombusNeighbors.push_back(std::move(neighborCenters));
-        }
-    }
-
-    void Grid::generateGridPoints(uint32_t numRows, uint32_t numCols,
-                                  double diagX, double diagY)
-    {
-        gridNodes.clear();
-
-        for (uint32_t row = 0; row < numRows; ++row)
-        {
-            double y = row * (diagY / 2.0);
-            for (uint32_t col = 0; col < numCols; ++col)
-            {
-                double x = col * (diagX / 2.0) + ((row % 2) ? diagX / 4.0 : 0.0);
-                gridNodes.emplace_back(Node{.point = {x, y}});
-            }
-        }
-
-        // Establish neighbor connections (like before)
-        auto index = [numCols](int r, int c)
-        { return r * numCols + c; };
-
-        for (uint32_t row = 0; row < numRows; ++row)
-        {
-            for (uint32_t col = 0; col < numCols; ++col)
-            {
-                Node &node = gridNodes[index(row, col)];
-                node.neighbors.clear();
-
-                std::vector<std::pair<int, int>> neighborOffsets;
-                if (row % 2 == 0)
-                {
-                    neighborOffsets = {
-                        {-1, -1}, {-1, 0}, {0, -1}, {0, 1}, {1, -1}, {1, 0}};
-                }
-                else
-                {
-                    neighborOffsets = {
-                        {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, 0}, {1, 1}};
-                }
-
-                for (auto [dr, dc] : neighborOffsets)
-                {
-                    int nr = static_cast<int>(row) + dr;
-                    int nc = static_cast<int>(col) + dc;
-                    if (nr >= 0 && nr < static_cast<int>(numRows) &&
-                        nc >= 0 && nc < static_cast<int>(numCols))
-                    {
-                        node.neighbors.push_back(&gridNodes[index(nr, nc)]);
-                    }
-                }
-            }
-        }
-
-        for (auto &node : gridNodes)
-        {
-            std::vector<Node *> rightSideNeighbors;
-
-            for (Node *n : node.neighbors)
-            {
-                if (n->point.x >= node.point.x)
-                    rightSideNeighbors.push_back(n);
-            }
-
-            // Optionally keep only up to 3 right-side neighbors
-            if (rightSideNeighbors.size() > 3)
-            {
-                rightSideNeighbors.resize(3);
-            }
-
-            // Store them somewhere, e.g.:
-            node.rightNeighbors = rightSideNeighbors;
-        }
-    }
-    void Grid::generateGridLines(uint32_t numRows, uint32_t numCols)
-    {
-        lines.clear();
-        for (uint32_t row = 0; row < numRows; ++row)
-        {
-            for (uint32_t col = 0; col < numCols; ++col)
-            {
-                uint32_t idx = row * numCols + col;
-                if (idx >= static_cast<uint32_t>(gridNodes.size()))
-                    continue;
-
-                auto addLine = [&](uint32_t r2, uint32_t c2)
-                {
-                    if (r2 >= 0 && r2 < numRows && c2 >= 0 && c2 < numCols)
-                    {
-                        uint32_t idx2 = r2 * numCols + c2;
-                        if (idx2 < static_cast<uint32_t>(gridNodes.size()))
-                        {
-                            lines.append(sf::Vertex(
-                                sf::Vector2f(gridNodes[idx].point.x, gridNodes[idx].point.y), sf::Color::White));
-                            lines.append(sf::Vertex(
-                                sf::Vector2f(gridNodes[idx2].point.x, gridNodes[idx2].point.y), sf::Color::White));
-                        }
-                    }
-                };
-
-                // Right neighbor
-                addLine(row, col + 1);
-
-                // Row-dependent neighbors
-                if (row % 2 == 0)
-                {
-                    addLine(row + 1, col - 1);
-                    addLine(row + 1, col);
-                }
-                else
-                {
-                    addLine(row + 1, col);
-                    addLine(row + 1, col + 1);
-                }
-            }
-        }
-    }
-    std::vector<Point> Grid::generateNeighbourCenters(const Point &center, float shift)
-    {
-        std::vector<Point> neighbors;
-        neighbors.reserve(8);
-
-        for (const auto &dir : DIRECTION_OFFSETS)
-        {
-            neighbors.emplace_back(center.x + dir.x * shift, center.y + dir.y * shift);
-        }
-
-        return neighbors;
-    }
-
-    std::optional<Rhombus> Grid::generateSingleRhombus(const Node &node)
-    {
-        if (node.rightNeighbors.size() < 3)
-            return std::nullopt;
-
-        if (node.rightNeighbors.size() > 4)
-        {
-            std::cerr << "Warning: Node has more than 4 right neighbors, skipping rhombus generation.\n";
-            return std::nullopt;
-        }
-
-        Rhombus rh;
-        rh.a = node.point;
-        rh.b = node.rightNeighbors[0]->point;
-        rh.c = node.rightNeighbors[1]->point;
-        rh.d = node.rightNeighbors[2]->point;
-        return rh;
-    }
-    
-    void Grid::drawRhombi(sf::RenderWindow &window, const sf::FloatRect &bounds) const
-    {
-        auto isRhombusVisible = [bounds](const Rhombus &r) -> bool
-        {
-            return bounds.contains({r.a.x, r.a.y}) ||
-                   bounds.contains({r.b.x, r.b.y}) ||
-                   bounds.contains({r.c.x, r.c.y}) ||
-                   bounds.contains({r.d.x, r.d.y});
-        };
-
-        for (uint32_t i = 0; i < rhombi.size(); ++i)
-        {
-            if (!isRhombusVisible(rhombi[i]))
-            {
-                continue;
-            }
-
-            const Rhombus &rh = rhombi[i];
-            sf::ConvexShape diamond;
-            diamond.setPointCount(4);
-            diamond.setPoint(0, sf::Vector2f(rh.a.x, rh.a.y));
-            diamond.setPoint(1, sf::Vector2f(rh.b.x, rh.b.y));
-            diamond.setPoint(2, sf::Vector2f(rh.c.x, rh.c.y));
-            diamond.setPoint(3, sf::Vector2f(rh.d.x, rh.d.y));
-
-            if (i == highlightedRhombiIndex)
-            {
-                diamond.setFillColor(sf::Color(255, 0, 0, 50));
-                diamond.setOutlineColor(sf::Color::Red);
-                diamond.setOutlineThickness(2.f);
-            }
-            else
-            {
-                diamond.setFillColor(sf::Color(0, 0, 255, 30));
-                diamond.setOutlineColor(sf::Color::Blue);
-                diamond.setOutlineThickness(1.f);
-            }
-
-            for (const uint32_t index : selectedRhombiIndices)
-            {
-                if (i == index)
-                {
-                    diamond.setFillColor(sf::Color(0, 255, 0, 100));
-                    diamond.setOutlineColor(sf::Color::Green);
-                    diamond.setOutlineThickness(2.f);
-                }
-            }
-            sf::CircleShape centerDot(3.f);
-            centerDot.setFillColor(sf::Color::Yellow);
-            centerDot.setPosition({rhombusCenters[i].x - 3.f, rhombusCenters[i].y - 3.f});
-            window.draw(centerDot);
-            window.draw(diamond);
-        }
+        selectedRhombi.clear();
+        highlightedIndex = UINT32_MAX;
     }
 }

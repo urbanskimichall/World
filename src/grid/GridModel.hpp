@@ -13,6 +13,7 @@ namespace grid
         std::vector<Rhombus> rhombi;
         std::vector<sf::Vector2f> rhombusCenters;
         std::vector<std::vector<utils::Point>> rhombusNeighbors;
+        std::vector<uint32_t> occupiedRhomus;
         std::optional<uint32_t> highlightedByMouseRhomusInd;
     };
 }

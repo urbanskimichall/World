@@ -56,8 +56,8 @@ namespace grid
                 shape.setFillColor(sf::Color(0, 0, 255, 30));
                 shape.setOutlineColor(sf::Color::Blue);
             }
-            //LOG_INFO("Highted index ", model.highlightedByMouseRhomusInd.value_or(1111));
-            if(const auto underMouse{model.highlightedByMouseRhomusInd}; i == underMouse.value())
+            // LOG_INFO("Highted index ", model.highlightedByMouseRhomusInd.value_or(1111));
+            if (const auto underMouse{model.highlightedByMouseRhomusInd}; i == underMouse.value())
             {
                 shape.setFillColor(sf::Color(128, 128, 128, 30));
                 shape.setOutlineColor(sf::Color::Yellow);
@@ -66,11 +66,20 @@ namespace grid
             shape.setOutlineThickness(1.5f);
             window.draw(shape);
 
-            // Draw center
-            sf::CircleShape dot(3.f);
-            dot.setFillColor(sf::Color::Yellow);
-            dot.setPosition({model.rhombusCenters[i].x - 3.f, model.rhombusCenters[i].y - 3.f});
-            window.draw(dot);
+            if (std::find(model.occupiedRhomus.begin(), model.occupiedRhomus.end(), i) != model.occupiedRhomus.end())
+            {
+                sf::CircleShape dot(3.f);
+                dot.setFillColor(sf::Color::Red);
+                dot.setPosition({model.rhombusCenters[i].x - 3.f, model.rhombusCenters[i].y - 3.f});
+                window.draw(dot);
+            }
+            else
+            {
+                sf::CircleShape dot(3.f);
+                dot.setFillColor(sf::Color::Yellow);
+                dot.setPosition({model.rhombusCenters[i].x - 3.f, model.rhombusCenters[i].y - 3.f});
+                window.draw(dot);
+            }
         }
     }
 }

@@ -35,6 +35,20 @@ public:
         componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
+
+        for(const auto& component : componentManager.getComponents())
+        {
+            for(uint32_t i = 0 ; i < grid.getRhomusCenters().size(); i++)
+            {
+                if(component->contains(grid.getRhomusCenters()[i]))
+                {
+                    LOG_INFO("Added occupied index ", i);
+                    grid.updateOccupiedRhombus(i);
+                }
+            }
+
+        }
+
     }
 
     void update(const sf::Vector2f &mouseWorld)

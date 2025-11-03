@@ -5,6 +5,7 @@
 #include "../grid/Grid.hpp"
 #include <SFML/Window/Event.hpp>
 #include "CollisionDetection.hpp"
+#include "ComponentListener.hpp"
 
 namespace components
 {
@@ -50,9 +51,16 @@ namespace components
             }
             else if (event.is<sf::Event::MouseButtonReleased>())
             {
-                auto m = event.getIf<sf::Event::MouseButtonReleased>();
+                const auto m = event.getIf<sf::Event::MouseButtonReleased>();
                 if (m->button == sf::Mouse::Button::Left)
+                {
                     isDragging = false;
+                    if (componentListener)
+                    {
+                        componentListener->onComponentMoved();
+                    }
+                    LOG_INFO("Left mouse released - stop dragging component!");
+                }
             }
             else if (event.is<sf::Event::MouseMoved>() && isDragging)
             {
@@ -119,10 +127,12 @@ namespace components
         virtual sf::Vector2f getPosition() const = 0;
         virtual void setPosition(const sf::Vector2f &pos) = 0;
         virtual std::vector<sf::Vector2f> getTransformedPoints() const = 0;
+        void setListener(ComponentListener *listener) { this->componentListener = listener; }
 
     protected:
         grid::Grid &grid;
         bool isDragging = false;
         sf::Vector2f dragOffset;
+        ComponentListener *componentListener = nullptr;
     };
 } // namespace components

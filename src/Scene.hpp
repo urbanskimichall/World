@@ -10,7 +10,7 @@
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::GRID_SPACING) {}
+    Scene() : grid(grid::numOfRows, grid::GRID_SPACING), componentManager(grid) {}
 
     void init()
     {
@@ -36,19 +36,7 @@ public:
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
-        for(const auto& component : componentManager.getComponents())
-        {
-            for(uint32_t i = 0 ; i < grid.getRhomusCenters().size(); i++)
-            {
-                if(component->contains(grid.getRhomusCenters()[i]))
-                {
-                    LOG_INFO("Added occupied index ", i);
-                    grid.updateOccupiedRhombus(i);
-                }
-            }
-
-        }
-
+        updateOccupiedCells();
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -59,7 +47,7 @@ public:
     void draw(sf::RenderWindow &target) const
     {
         componentManager.draw(target);
-        
+
         sf::FloatRect bounds = getViewBounds(target);
         grid.draw(target, bounds);
     }
@@ -80,6 +68,22 @@ private:
         float width = view.getSize().x;
         float height = view.getSize().y;
         return sf::FloatRect({left, top}, {width, height});
+    }
+
+    void updateOccupiedCells()
+    {
+        grid.resetOccupiedRhombus();
+        for (const auto &component : componentManager.getComponents())
+        {
+            for (uint32_t i = 0; i < grid.getRhomusCenters().size(); i++)
+            {
+                if (component->contains(grid.getRhomusCenters()[i]))
+                {
+                    LOG_INFO("Added occupied index ", i);
+                    grid.updateOccupiedRhombus(i);
+                }
+            }
+        }
     }
 
     grid::Grid grid;

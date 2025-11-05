@@ -25,8 +25,8 @@ namespace grid
             return UINT32_MAX;
         }
 
-        void selectRhombusAtMouse(GridModel &model, const sf::Vector2f &mousePos,
-                                  std::vector<uint32_t> &selectedRhombiIndices) const
+        uint32_t selectRhombusAtMouse(GridModel &model, const sf::Vector2f &mousePos,
+                                      std::vector<uint32_t> &selectedRhombiIndices) const
         {
             for (uint32_t i = 0; i < model.rhombi.size(); ++i)
             {
@@ -41,12 +41,12 @@ namespace grid
                     {
                         LOG_INFO("Neighbour index: ", j, "position x: ", model.rhombusNeighbors[i][j].x, " y: ", model.rhombusNeighbors[i][j].y);
                     }
-                    break;
+                    return i;
                 }
             }
         }
 
-        void unselectRhombusAtMouse(GridModel &model, const sf::Vector2f &mousePos,
+        uint32_t unselectRhombusAtMouse(GridModel &model, const sf::Vector2f &mousePos,
                                     std::vector<uint32_t> &selectedRhombiIndices) const
         {
             for (uint32_t i = 0; i < model.rhombi.size(); ++i)
@@ -59,7 +59,7 @@ namespace grid
                         selectedRhombiIndices.end());
                     LOG_INFO("Rhombus at index ", i, " unselected, center at (",
                              r.center().x, ", ", r.center().y, ")");
-                    break;
+                    return i;
                 }
             }
         }

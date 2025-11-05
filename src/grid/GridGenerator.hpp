@@ -10,11 +10,12 @@ namespace grid
         GridModel generate(uint32_t numRows, uint32_t numCols);
 
     private:
-        void generateGridPoints(GridModel& model, uint32_t numRows, uint32_t numCols,
+        void generateGridPoints(GridModel &model, uint32_t numRows, uint32_t numCols,
                                 double diagX, double diagY);
-        void generateRhombi(GridModel& model);
-        std::optional<Rhombus> generateSingleRhombus(const Node& node);
-        std::vector<utils::Point> generateNeighbourCenters(const utils::Point& center, float shift);
+        void generateRhombi(GridModel &model);
+
+        std::optional<Rhombus> generateSingleRhombus(const Node &node);
+        std::vector<utils::Point> generateNeighbourCenters(const utils::Point &center, float shift);
 
         double spacing;
         static constexpr float SHIFT = 25.f;

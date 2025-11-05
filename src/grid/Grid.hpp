@@ -3,7 +3,10 @@
 #include "GridGenerator.hpp"
 #include "GridRenderer.hpp"
 #include "GridSelector.hpp"
+#include "Pathfinder.hpp"
 #include "../Logger.hpp"
+#include <unordered_set>
+#include <queue>
 #include <SFML/Graphics.hpp>
 
 namespace grid
@@ -27,7 +30,18 @@ namespace grid
         uint32_t highlightRhombusUnderMouse(const sf::Vector2f &mousePos) { return selector.highlightRhombusUnderMouse(model, mousePos); }
         void selectRhombusAtMouse(const sf::Vector2f &mousePos)
         {
-            selector.selectRhombusAtMouse(model, mousePos, selectedRhombi);
+            const uint32_t index =
+             selector.selectRhombusAtMouse(model, mousePos, selectedRhombi);
+
+            uint32_t start = index;
+            uint32_t goal = 42;
+
+            model.path = grid::aStarFindPath(start, goal, model.rhombusCenters, model.neighborIndices, model.occupiedRhomus);
+
+            if (model.path.empty())
+                LOG_INFO("No path find for start index: ", start, "goal index: ", goal);
+            else
+                LOG_INFO("Start index: ", start, "goal index: ", goal, "Path length: ", model.path.size());
         }
         void unselectRhombusAtMouse(const sf::Vector2f &mousePos)
         {

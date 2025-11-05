@@ -2,9 +2,44 @@
 #include "../Logger.hpp"
 #include "GridSpacing.hpp"
 #include <cmath>
+#include <unordered_set>
+#include <queue>
 
 namespace grid
 {
+    auto hashVec = [](const sf::Vector2f &v)
+    {
+        return (static_cast<size_t>(v.x) * 73856093) ^
+               (static_cast<size_t>(v.y) * 19349663);
+    };
+
+    void buildCenterIndexLookup(GridModel &model)
+    {
+        model.centerIndexLookup.clear();
+        for (uint32_t i = 0; i < model.rhombusCenters.size(); i++)
+        {
+            model.centerIndexLookup[hashVec(model.rhombusCenters[i])] = i;
+        }
+    }
+
+    void buildNeighborIndices(grid::GridModel &model)
+    {
+        model.neighborIndices.assign(model.rhombusCenters.size(), {});
+
+        for (uint32_t i = 0; i < model.rhombusCenters.size(); i++)
+        {
+            for (const auto &p : model.rhombusNeighbors[i])
+            {
+                sf::Vector2f v{p.x, p.y};
+                auto it = model.centerIndexLookup.find(hashVec(v));
+                if (it != model.centerIndexLookup.end())
+                {
+                    model.neighborIndices[i].push_back(it->second);
+                }
+            }
+        }
+    }
+
     GridGenerator::GridGenerator(double spacing) : spacing(spacing) {}
 
     GridModel GridGenerator::generate(uint32_t numRows, uint32_t numCols)
@@ -12,6 +47,9 @@ namespace grid
         GridModel model;
         generateGridPoints(model, numRows, numCols, RHOMBUS_DIAG_X, RHOMBUS_DIAG_Y);
         generateRhombi(model);
+        buildCenterIndexLookup(model);
+        buildNeighborIndices(model);
+
         return model;
     }
 
@@ -71,6 +109,7 @@ namespace grid
         model.rhombi.clear();
         model.rhombusCenters.clear();
         model.rhombusNeighbors.clear();
+        model.neighborIndices.clear();
 
         for (const auto &node : model.nodes)
         {

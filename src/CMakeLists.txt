@@ -14,6 +14,13 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+#find_program(CCACHE_PROGRAM ccache)
+#if(CCACHE_PROGRAM)
+#    message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+    #set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    #set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+#endif()
+
 
 # 🔹 Wyłącz niepotrzebne ostrzeżenia CMake dla MinGW
 if (MINGW)
@@ -25,6 +32,7 @@ add_executable(${PROJECT_NAME}
     main.cpp grid/Grid.cpp grid/Grid.hpp grid/GridGenerator.cpp grid/GridRenderer.cpp grid/GridSelector.cpp
      World.hpp World.cpp components/Component.cpp components/Component.hpp
     components/ComponentManager.cpp components/ComponentManager.hpp
+    grid/Pathfinder.cpp
 )
 
 # 🔹 Ścieżki nagłówków

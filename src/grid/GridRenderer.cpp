@@ -80,6 +80,14 @@ namespace grid
                 dot.setPosition({model.rhombusCenters[i].x - 3.f, model.rhombusCenters[i].y - 3.f});
                 window.draw(dot);
             }
+
+            if (std::find(model.path.begin(), model.path.end(), i) != model.path.end())
+            {
+                sf::CircleShape dot(4.f);
+                dot.setFillColor(sf::Color::Blue);
+                dot.setPosition({model.rhombusCenters[i].x - 4.f, model.rhombusCenters[i].y - 4.f});
+                window.draw(dot);
+            }
         }
     }
 }

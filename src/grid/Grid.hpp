@@ -27,6 +27,8 @@ namespace grid
         const std::vector<Node> &getGridNodes() const { return model.nodes; }
         std::vector<Node> &getGridNodes() { return model.nodes; }
         const auto &getRhomusCenters() const { return model.rhombusCenters; }
+        const auto &getRhomusCentersPoints() const {return model.rhombusCentersPoints;}
+        const auto &getPath() const {return model.path;}
         const Node *findClosestNode(const sf::Vector2f &pos) const { return selector.findClosestNode(model, pos); }
         uint32_t highlightRhombusUnderMouse(const sf::Vector2f &mousePos) { return selector.highlightRhombusUnderMouse(model, mousePos); }
         void selectRhombusAtMouse(const sf::Vector2f &mousePos)

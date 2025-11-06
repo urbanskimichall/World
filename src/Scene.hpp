@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "grid/Grid.hpp"
+#include "Mover.hpp"
 #include "components/ComponentManager.hpp"
 #include <array>
 #include "grid/GridSpacing.hpp"
@@ -37,11 +38,13 @@ public:
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
         updateOccupiedCells();
+        mover.init();
     }
 
     void update(const sf::Vector2f &mouseWorld)
     {
         grid.highlightRhombusUnderMouse(mouseWorld);
+        mover.updateMover(grid.getPath(), grid.getRhomusCentersPoints());
     }
 
     void draw(sf::RenderWindow &target) const
@@ -50,6 +53,7 @@ public:
 
         sf::FloatRect bounds = getViewBounds(target);
         grid.draw(target, bounds);
+        mover.draw(target);
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -88,4 +92,5 @@ private:
 
     grid::Grid grid;
     components::ComponentManager componentManager;
+    Mover mover;
 };

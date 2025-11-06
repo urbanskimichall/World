@@ -121,6 +121,7 @@ namespace grid
             utils::Point c = rh.center();
             model.rhombi.push_back(rh);
             model.rhombusCenters.emplace_back(c.x, c.y);
+            model.rhombusCentersPoints.emplace_back(utils::Point{c.x, c.y});
             model.rhombusNeighbors.push_back(generateNeighbourCenters(c, SHIFT));
         }
 

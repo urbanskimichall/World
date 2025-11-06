@@ -16,6 +16,7 @@ namespace grid
         std::vector<Node> nodes;
         std::vector<Rhombus> rhombi;
         std::vector<sf::Vector2f> rhombusCenters;
+        std::vector<utils::Point> rhombusCentersPoints;
         std::vector<std::vector<utils::Point>> rhombusNeighbors;
         std::vector<std::vector<uint32_t>> neighborIndices;
         std::vector<uint32_t> occupiedRhomus;

@@ -4,6 +4,7 @@
 #include "GridRenderer.hpp"
 #include "GridSelector.hpp"
 #include "Pathfinder.hpp"
+#include "PathManager.hpp"
 #include "../Logger.hpp"
 #include <unordered_set>
 #include <queue>
@@ -37,11 +38,17 @@ namespace grid
             uint32_t goal = 42;
 
             model.path = grid::aStarFindPath(start, goal, model.rhombusCenters, model.neighborIndices, model.occupiedRhomus);
+            pathManager.paths[{start,goal}] = model.path;
 
             if (model.path.empty())
-                LOG_INFO("No path find for start index: ", start, "goal index: ", goal);
+                LOG_INFO("No path find for start index: ", start, " goal index: ", goal);
             else
-                LOG_INFO("Start index: ", start, "goal index: ", goal, "Path length: ", model.path.size());
+            {
+                LOG_INFO("Start index: ", start, " goal index: ", goal, " path length: ", model.path.size(),
+                         " pathmanager paths number: ", pathManager.paths.size());
+                LOG_INFO("Dist pathIndex: 0 from pathIndex: 1 DIST: ",
+                    model.rhombusCentersPoints[model.path[0]].distanceTo(model.rhombusCentersPoints[model.path[1]]));
+            }
         }
         void unselectRhombusAtMouse(const sf::Vector2f &mousePos)
         {
@@ -59,6 +66,9 @@ namespace grid
         GridGenerator generator;
         GridRenderer renderer;
         GridSelector selector;
+
+        PathManager pathManager;
+
 
         std::vector<uint32_t> selectedRhombi;
         uint32_t highlightedIndex = UINT32_MAX;

@@ -7,6 +7,7 @@
 #include <array>
 #include "grid/GridSpacing.hpp"
 #include "components/RectangleComponent.hpp"
+#include "FieldTile.hpp"
 
 class Scene
 {
@@ -54,6 +55,7 @@ public:
         sf::FloatRect bounds = getViewBounds(target);
         grid.draw(target, bounds);
         mover.draw(target);
+        fieldTile.draw(target);
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -93,4 +95,6 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Mover mover;
+    
+    FieldTile fieldTile;
 };

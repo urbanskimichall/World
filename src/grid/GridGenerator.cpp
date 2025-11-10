@@ -122,7 +122,8 @@ namespace grid
             model.rhombi.push_back(rh);
             model.rhombusCenters.emplace_back(c.x, c.y);
             model.rhombusCentersPoints.emplace_back(utils::Point{c.x, c.y});
-            model.rhombusNeighbors.push_back(generateNeighbourCenters(c, SHIFT));
+            constexpr float shiftToNeighbour{grid::RHOMBUS_DIAG_Y};
+            model.rhombusNeighbors.push_back(generateNeighbourCenters(c, shiftToNeighbour));
         }
 
         LOG_INFO("Generated ", model.rhombi.size(), " rhombi");

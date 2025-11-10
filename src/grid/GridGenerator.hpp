@@ -18,6 +18,5 @@ namespace grid
         std::vector<utils::Point> generateNeighbourCenters(const utils::Point &center, float shift);
 
         double spacing;
-        static constexpr float SHIFT = 25.f;
     };
 }

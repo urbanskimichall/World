@@ -5,9 +5,10 @@
 class FieldTile
 {
 public:
-    FieldTile()
-        : sprite(TextureManager::instance().get("assets/field100x50.png"))
+    FieldTile(const sf::Vector2f initPosition = {0.f, 0.f})
+        : sprite(TextureManager::instance().get("assets/field100x50_2.png"))
     {
+        sprite.setPosition(initPosition);
     }
 
     void draw(sf::RenderTarget& target) const

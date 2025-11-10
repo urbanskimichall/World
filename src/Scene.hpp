@@ -12,7 +12,7 @@
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::GRID_SPACING), componentManager(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid) {}
 
     void init()
     {
@@ -40,6 +40,19 @@ public:
 
         updateOccupiedCells();
         mover.init();
+
+        const float tileWidth = 100.f;
+        const float tileHeight = 50.f;
+        // fieldsTiles.emplace_back(FieldTile({200, 50}));
+        // fieldsTiles.emplace_back(FieldTile({250, 75}));
+        // fieldsTiles.emplace_back(FieldTile({0,0}));
+        // fieldsTiles.emplace_back(FieldTile({50,25}));
+        // fieldsTiles.emplace_back(FieldTile({100, 50}));
+        // fieldsTiles.emplace_back(FieldTile({150, 75}));
+        // fieldsTiles.emplace_back(FieldTile({200, 100}));
+
+
+
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -54,8 +67,12 @@ public:
 
         sf::FloatRect bounds = getViewBounds(target);
         grid.draw(target, bounds);
+
         mover.draw(target);
-        fieldTile.draw(target);
+        for(const auto& fieldTile : fieldsTiles)
+        {
+            fieldTile.draw(target);
+        }
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -95,6 +112,7 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Mover mover;
-    
+
     FieldTile fieldTile;
+    std::vector<FieldTile> fieldsTiles;
 };

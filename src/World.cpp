@@ -22,6 +22,7 @@ void World::create()
     ViewController viewController(view);
     EventHandler eventHandler;
     FpsCounter fpsCounter;
+            
 
     while (window.isOpen())
     {

@@ -56,8 +56,8 @@ namespace grid
                 shape.setFillColor(sf::Color(0, 0, 255, 30));
                 shape.setOutlineColor(sf::Color::Blue);
             }
-            // LOG_INFO("Highted index ", model.highlightedByMouseRhomusInd.value_or(1111));
-            if (const auto underMouse{model.highlightedByMouseRhomusInd}; i == underMouse.value())
+            if (const auto underMouse{model.highlightedByMouseRhomusInd};
+                underMouse.has_value() and i == underMouse.value())
             {
                 shape.setFillColor(sf::Color(128, 128, 128, 30));
                 shape.setOutlineColor(sf::Color::Yellow);

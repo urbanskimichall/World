@@ -12,7 +12,7 @@
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols, grid::GRID_SPACING), componentManager(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid) {}
 
     void init()
     {

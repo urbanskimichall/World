@@ -15,7 +15,7 @@ namespace grid
     class Grid
     {
     public:
-        Grid(uint32_t rows, uint32_t cols, double spacing);
+        Grid(uint32_t rows, uint32_t cols);
 
         void generate(uint32_t rows, uint32_t cols);
         void draw(sf::RenderWindow &window, const sf::FloatRect &viewBounds) const;

@@ -2,8 +2,7 @@
 
 namespace grid
 {
-    Grid::Grid(uint32_t rows, uint32_t cols, double spacing)
-        : generator(spacing)
+    Grid::Grid(uint32_t rows, uint32_t cols)
     {
         generate(rows, cols);
     }

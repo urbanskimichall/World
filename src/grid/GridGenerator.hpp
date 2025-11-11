@@ -6,7 +6,7 @@ namespace grid
     class GridGenerator
     {
     public:
-        explicit GridGenerator(double spacing = 5.0);
+        GridGenerator(){}
         GridModel generate(uint32_t numRows, uint32_t numCols);
 
     private:

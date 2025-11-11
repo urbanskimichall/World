@@ -40,8 +40,6 @@ namespace grid
         }
     }
 
-    GridGenerator::GridGenerator(double spacing) : spacing(spacing) {}
-
     GridModel GridGenerator::generate(uint32_t numRows, uint32_t numCols)
     {
         GridModel model;

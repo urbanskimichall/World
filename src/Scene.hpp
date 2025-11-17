@@ -43,16 +43,19 @@ public:
 
         const float tileWidth = 100.f;
         const float tileHeight = 50.f;
-        // fieldsTiles.emplace_back(FieldTile({200, 50}));
-        // fieldsTiles.emplace_back(FieldTile({250, 75}));
-        // fieldsTiles.emplace_back(FieldTile({0,0}));
-        // fieldsTiles.emplace_back(FieldTile({50,25}));
-        // fieldsTiles.emplace_back(FieldTile({100, 50}));
-        // fieldsTiles.emplace_back(FieldTile({150, 75}));
-        // fieldsTiles.emplace_back(FieldTile({200, 100}));
-
-
-
+        std::string homeLevel1 = "assets/simple_home_level_1.png";
+        std::string homeLevel2 = "assets/simple_home_level_2.png";
+        std::string homeLevel3 = "assets/simple_home_level_3.png";
+        std::string homeLevel7 = "assets/simple_home_level_7.png";
+        std::string fieldLevel1 = "assets/simple_field_level_1.png";
+        std::string treeLevel1 = "assets/simple_tree_level_1.png";
+        fieldsTiles.emplace_back(HomeTile{{200, 50}, homeLevel1});
+        fieldsTiles.emplace_back(HomeTile(sf::Vector2f{250, 75}, homeLevel2));
+        fieldsTiles.emplace_back(HomeTile(sf::Vector2f{0, 0}, homeLevel1));
+        fieldsTiles.emplace_back(HomeTile({50, 25}, homeLevel3));
+        fieldsTiles.emplace_back(HomeTile({300, 50}, fieldLevel1));
+        fieldsTiles.emplace_back(HomeTile({150, 75}, treeLevel1));
+        fieldsTiles.emplace_back(HomeTile({450, 75}, homeLevel7));
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -69,7 +72,7 @@ public:
         grid.draw(target, bounds);
 
         mover.draw(target);
-        for(const auto& fieldTile : fieldsTiles)
+        for (const auto &fieldTile : fieldsTiles)
         {
             fieldTile.draw(target);
         }
@@ -113,6 +116,6 @@ private:
     components::ComponentManager componentManager;
     Mover mover;
 
-    FieldTile fieldTile;
-    std::vector<FieldTile> fieldsTiles;
+    HomeTile fieldTile;
+    std::vector<HomeTile> fieldsTiles;
 };

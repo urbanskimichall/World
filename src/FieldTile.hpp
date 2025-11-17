@@ -2,13 +2,17 @@
 #include <SFML/Graphics.hpp>
 #include "TextureManager.hpp"
 
-class FieldTile
+class HomeTile
 {
 public:
-    FieldTile(const sf::Vector2f initPosition = {0.f, 0.f})
-        : sprite(TextureManager::instance().get("assets/field100x50_2.png"))
+    HomeTile(sf::Vector2f initPosition = {0,0}, std::string filename = "assets/simple_home_level_1.png")
+        : sprite(TextureManager::instance().get(filename))
     {
         sprite.setPosition(initPosition);
+        
+        //sprite.rotate(sf::degrees(7.f));
+        //sprite.scale({1.f, 0.55f});
+
     }
 
     void draw(sf::RenderTarget& target) const

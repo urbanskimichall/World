@@ -9,7 +9,7 @@ namespace grid
 
      // 2:1 rhombus dimensions
     constexpr float RHOMBUS_DIAG_X = 100.0f;
-    constexpr float RHOMBUS_DIAG_Y = 25.f;
+    constexpr float RHOMBUS_DIAG_Y = RHOMBUS_DIAG_X / 4.f;
 
     constexpr std::uint32_t numOfRows = 80;
     constexpr std::uint32_t numOfCols = 20;

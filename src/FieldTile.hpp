@@ -10,13 +10,13 @@ public:
         : DraggableComponent(grid), sprite(TextureManager::instance().get(filename))
     {
         sprite.setPosition(initPosition);
-        occupiedZone.setPosition(initPosition);
-        occupiedZone.setSize({sprite.getGlobalBounds().size});
+        occupiedZone.setPosition({initPosition.x, initPosition.y + sprite.getGlobalBounds().size.y * 3 / 4});
+        occupiedZone.setSize({sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y / 4});
     }
 
     void draw(sf::RenderTarget &target) const override
     {
-        target.draw(occupiedZone);
+        //target.draw(occupiedZone);
         target.draw(sprite);
     }
 
@@ -24,7 +24,7 @@ public:
     void setPosition(const sf::Vector2f &pos) override
     {
         sprite.setPosition(pos);
-        occupiedZone.setPosition(pos);
+        occupiedZone.setPosition({pos.x, pos.y + sprite.getGlobalBounds().size.y * 3 / 4});
     }
     std::vector<sf::Vector2f> getTransformedPoints() const override
     {

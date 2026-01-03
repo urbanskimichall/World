@@ -67,6 +67,8 @@ public:
         componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramHomeLevel7, sf::Color::Green);
         HomeTile homeTile(grid, {450, 200}, homeLevel7);
         componentManager.emplaceComponent<HomeTile>(homeTile);
+        HomeTile homeTile2(grid, {200, 50}, homeLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile2);
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -83,10 +85,10 @@ public:
         grid.draw(target, bounds);
 
         mover.draw(target);
-        for (const auto &fieldTile : fieldsTiles)
-        {
-            fieldTile.draw(target);
-        }
+        // for (const auto &fieldTile : fieldsTiles)
+        // {
+        //     fieldTile.draw(target);
+        // }
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)

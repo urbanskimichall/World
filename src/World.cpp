@@ -40,7 +40,8 @@ void World::create()
 
         scene.update(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 
-        window.clear();
+        window.clear(sf::Color::Green);
+
         window.setView(view);
         scene.draw(window);
         window.display();

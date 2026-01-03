@@ -34,9 +34,9 @@ public:
             sf::Vector2f(540.f, 280.f),
             sf::Vector2f(420.f, 280.f)};
 
-        componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
-        componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
-        componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
+        //componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
+        //componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
+        //componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
         updateOccupiedCells();
         mover.init();
@@ -49,13 +49,24 @@ public:
         std::string homeLevel7 = "assets/simple_home_level_7.png";
         std::string fieldLevel1 = "assets/simple_field_level_1.png";
         std::string treeLevel1 = "assets/simple_tree_level_1.png";
-        fieldsTiles.emplace_back(HomeTile{{200, 50}, homeLevel1});
-        fieldsTiles.emplace_back(HomeTile(sf::Vector2f{250, 75}, homeLevel2));
-        fieldsTiles.emplace_back(HomeTile(sf::Vector2f{0, 0}, homeLevel1));
-        fieldsTiles.emplace_back(HomeTile({50, 25}, homeLevel3));
-        fieldsTiles.emplace_back(HomeTile({300, 50}, fieldLevel1));
-        fieldsTiles.emplace_back(HomeTile({150, 75}, treeLevel1));
-        fieldsTiles.emplace_back(HomeTile({450, 75}, homeLevel7));
+        // fieldsTiles.emplace_back(HomeTile{{200, 50}, homeLevel1});
+        // fieldsTiles.emplace_back(HomeTile(sf::Vector2f{250, 75}, homeLevel2));
+        // fieldsTiles.emplace_back(HomeTile(sf::Vector2f{0, 0}, homeLevel1));
+        // fieldsTiles.emplace_back(HomeTile({50, 25}, homeLevel3));
+        // fieldsTiles.emplace_back(HomeTile({300, 50}, fieldLevel1));
+        // fieldsTiles.emplace_back(HomeTile({150, 75}, treeLevel1));
+        // fieldsTiles.emplace_back(HomeTile({450, 75}, homeLevel7));
+
+        // HomeTile homeLevel7_({450, 75}, homeLevel7);
+
+        std::array<sf::Vector2f, 4> parallerogramHomeLevel7 = {
+            sf::Vector2f(450.f, 200.f),
+            sf::Vector2f(540.f, 150.f),
+            sf::Vector2f(630.f, 200.f),
+            sf::Vector2f(530.f, 240.f)};
+        componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramHomeLevel7, sf::Color::Green);
+        HomeTile homeTile(grid, {450, 200}, homeLevel7);
+        componentManager.emplaceComponent<HomeTile>(homeTile);
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -98,6 +109,7 @@ private:
 
     void updateOccupiedCells()
     {
+        std::cout << "Updating occupied rhombus cells based on component positions...\n";
         grid.resetOccupiedRhombus();
         for (const auto &component : componentManager.getComponents())
         {
@@ -116,6 +128,5 @@ private:
     components::ComponentManager componentManager;
     Mover mover;
 
-    HomeTile fieldTile;
     std::vector<HomeTile> fieldsTiles;
 };

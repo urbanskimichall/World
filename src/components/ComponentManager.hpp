@@ -6,6 +6,7 @@
 #include "DraggableComponent.hpp"
 #include "ComponentListener.hpp"
 #include "../grid/Grid.hpp"
+#include "../FieldTile.hpp"
 
 namespace components
 {
@@ -20,9 +21,11 @@ namespace components
             comp->setListener(this);
             T &ref = *comp;
             components.emplace_back(std::move(comp));
+            std::cout << "ComponentManager: Emplaced component. Total components: " << components.size() << std::endl;
 
             return ref;
         }
+        void emplaceHome(HomeTile& homeTile){homes.push_back(homeTile);}
         void onComponentMoved() override;
         void handleEvent(const sf::Event &event, const sf::RenderWindow &window);
         void draw(sf::RenderTarget &target) const;
@@ -31,6 +34,7 @@ namespace components
 
     private:
         std::vector<std::unique_ptr<DraggableComponent>> components;
+        std::vector<HomeTile> homes;
         grid::Grid &grid;
     };
 }

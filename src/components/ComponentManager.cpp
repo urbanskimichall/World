@@ -31,6 +31,10 @@ void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindo
 
 void ComponentManager::draw(sf::RenderTarget &target) const
 {
-    for (const auto &c : components)
-        c->draw(target);
+    for (uint16_t i{0}; i < components.size(); i++)
+    {
+        components[i]->draw(target);
+        //homes[i].draw(target);
+    }
+        
 }

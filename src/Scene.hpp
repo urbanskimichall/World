@@ -46,7 +46,13 @@ public:
         std::string homeLevel1 = "assets/simple_home_level_1.png";
         std::string homeLevel2 = "assets/simple_home_level_2.png";
         std::string homeLevel3 = "assets/simple_home_level_3.png";
+        std::string homeLevel4 = "assets/simple_home_level_4.png";
+        std::string homeLevel5 = "assets/simple_home_level_5.png";
+        std::string homeLevel6 = "assets/simple_home_level_6.png";
         std::string homeLevel7 = "assets/simple_home_level_7.png";
+        std::string homeLevel8 = "assets/simple_home_level_8.png";
+        std::string homeLevel9 = "assets/simple_home_level_9.png";
+        std::string homeLevel10 = "assets/simple_home_level_10.png";
         std::string fieldLevel1 = "assets/simple_field_level_1.png";
         std::string treeLevel1 = "assets/simple_tree_level_1.png";
         // fieldsTiles.emplace_back(HomeTile{{200, 50}, homeLevel1});
@@ -69,6 +75,32 @@ public:
         componentManager.emplaceComponent<HomeTile>(homeTile);
         HomeTile homeTile2(grid, {200, 50}, homeLevel1);
         componentManager.emplaceComponent<HomeTile>(homeTile2);
+        HomeTile homeTile3(grid, {250, 75}, homeLevel2);
+        componentManager.emplaceComponent<HomeTile>(homeTile3);
+        HomeTile homeTile4(grid, {0, 0}, homeLevel4);
+        componentManager.emplaceComponent<HomeTile>(homeTile4);
+        HomeTile homeTile5(grid, {50, 25}, homeLevel5);
+        componentManager.emplaceComponent<HomeTile>(homeTile5);
+        HomeTile homeTile6(grid, {300, 50}, fieldLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile6);
+        HomeTile homeTile7(grid, {150, 75}, treeLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile7);
+        HomeTile homeTile8(grid, {600, 300}, homeLevel8);
+        componentManager.emplaceComponent<HomeTile>(homeTile8);
+        HomeTile homeTile9(grid, {700, 350}, homeLevel9);
+        componentManager.emplaceComponent<HomeTile>(homeTile9);
+        HomeTile homeTile10(grid, {800, 400}, homeLevel10);
+        componentManager.emplaceComponent<HomeTile>(homeTile10);
+        HomeTile homeTile11(grid, {400, 150}, homeLevel6);
+        componentManager.emplaceComponent<HomeTile>(homeTile11);
+        HomeTile homeTile12(grid, {350, 125}, homeLevel3);
+        componentManager.emplaceComponent<HomeTile>(homeTile12);
+        HomeTile homeTile13(grid, {500, 250}, homeLevel2);
+        componentManager.emplaceComponent<HomeTile>(homeTile13);
+        HomeTile homeTile14(grid, {550, 275}, homeLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile14);
+        HomeTile homeTile15(grid, {750, 375}, homeLevel5);
+        componentManager.emplaceComponent<HomeTile>(homeTile15);
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -82,7 +114,7 @@ public:
         componentManager.draw(target);
 
         sf::FloatRect bounds = getViewBounds(target);
-        grid.draw(target, bounds);
+        //grid.draw(target, bounds);
 
         mover.draw(target);
         // for (const auto &fieldTile : fieldsTiles)

@@ -25,7 +25,7 @@ namespace components
 
             return ref;
         }
-        void emplaceHome(HomeTile& homeTile){homes.push_back(homeTile);}
+        void emplaceHome(HomeTile &homeTile) { homes.push_back(homeTile); }
         void onComponentMoved() override;
         void handleEvent(const sf::Event &event, const sf::RenderWindow &window);
         void draw(sf::RenderTarget &target) const;
@@ -33,6 +33,19 @@ namespace components
         const std::vector<std::unique_ptr<DraggableComponent>> &getComponents() const { return components; }
 
     private:
+        void sortComponentsByYPosition()
+        {
+            std::sort(components.begin(), components.end(), [](const std::unique_ptr<DraggableComponent> &a, const std::unique_ptr<DraggableComponent> &b)
+                      {
+                        const auto aBounds = a->getTransformedPoints();
+                        const auto bBounds = b->getTransformedPoints();
+                    if (aBounds[3] != bBounds[3])
+                    {
+            return aBounds[3].y < bBounds[3].y;
+                    }
+
+        return aBounds[0].x < bBounds[0].x; });
+        }
         std::vector<std::unique_ptr<DraggableComponent>> components;
         std::vector<HomeTile> homes;
         grid::Grid &grid;

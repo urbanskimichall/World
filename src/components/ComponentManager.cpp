@@ -17,6 +17,7 @@ void ComponentManager::onComponentMoved()
             }
         }
     }
+    sortComponentsByYPosition();
 
     LOG_INFO("Updated occupied rhombi for moved component.");
 }
@@ -27,6 +28,7 @@ void ComponentManager::handleEvent(const sf::Event &event, const sf::RenderWindo
     {
         component->handleEvent(event, window, components);
     }
+    sortComponentsByYPosition();
 }
 
 void ComponentManager::draw(sf::RenderTarget &target) const
@@ -34,7 +36,5 @@ void ComponentManager::draw(sf::RenderTarget &target) const
     for (uint16_t i{0}; i < components.size(); i++)
     {
         components[i]->draw(target);
-        //homes[i].draw(target);
-    }
-        
+    }        
 }

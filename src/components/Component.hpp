@@ -1,51 +1,167 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
-#include "ComponentDescriptor.hpp"
+#include <vector>
+#include <memory>
 #include "../grid/Grid.hpp"
-#include "../utils/Round.hpp"
-#include <iostream>
+#include <SFML/Window/Event.hpp>
+#include "CollisionDetection.hpp"
+#include "ComponentListener.hpp"
+#include "BoxInfo.hpp"
 
 namespace components
 {
-    using Node = grid::Node;
-    // TODO make Component an abstract base class
+    inline bool pointInPolygon(const sf::Vector2f &p, const std::vector<sf::Vector2f> &polygon)
+    {
+        bool inside = false;
+        std::size_t n = polygon.size();
+        for (std::size_t i = 0, j = n - 1; i < n; j = i++)
+        {
+            const auto &pi = polygon[i];
+            const auto &pj = polygon[j];
+
+            bool intersect = ((pi.y > p.y) != (pj.y > p.y)) &&
+                             (p.x < (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y + 1e-6f) + pi.x);
+            if (intersect)
+                inside = !inside;
+        }
+        return inside;
+    }
+
+    enum class Capability : uint32_t
+    {
+        None = 0,
+        Draggable = 1 << 0,
+        Movable = 1 << 1
+    };
+
+    inline Capability operator|(Capability a, Capability b)
+    {
+        return static_cast<Capability>(
+            static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+    }
+
+    class ComponentBase
+    {
+    public:
+        virtual ~ComponentBase() = default;
+        virtual Capability capabilities() const = 0;
+    };
+
+    //let's make it as base
     class Component
     {
     public:
-        Component(const grid::Grid &grid, float xPosition = 0.f, float yPosition = 0.f, double length = 90.f, double height = 45.f, sf::Color color = sf::Color::Green)
-            : grid(grid), isDragging(false)
+        explicit Component(grid::Grid &grid) : grid(grid) {}
+        virtual ~Component() = default;
+
+        virtual Capability capabilities() const
         {
-            const auto node = findClosestNode({xPosition, yPosition});
-            rectangle.setFillColor(color);
-            rectangle.setPosition({node->point.x, node->point.y});
-            sf::Vector2f oldOrigin = rectangle.getOrigin();
-            sf::Vector2f oldPos = rectangle.getPosition();
-            sf::Vector2f newOrigin = {0.f, rectangle.getSize().y};
-            sf::Vector2f offset = newOrigin - oldOrigin;
-            rectangle.setOrigin(newOrigin);
-            rectangle.setPosition(oldPos + offset);
-            //length = utils::roundUpToMultiple(length, (grid.getSpacing()));
-            const auto distanceToRightNeighbor = node->distanceOnYAxis(*node->neighbors[1]);
-            height = utils::roundUpToMultiple(height, (distanceToRightNeighbor));
-            rectangle.setSize({static_cast<float>(length), static_cast<float>(height)});
+            return Capability::Draggable;
         }
 
-        virtual void handleEvent(const sf::Event &event, const sf::RenderWindow &window, const std::vector<std::unique_ptr<Component>> &others);
-        virtual RectComponentDescriptor getDescriptor() const;
-        virtual void draw(sf::RenderTarget &target) const;
-        virtual void setPosition(const sf::Vector2f &position) { rectangle.setPosition(position); }
+        // wspólna obsługa zdarzeń (używa virtuali poniżej)
+        void handleEvent(const sf::Event &event, const sf::RenderWindow &window,
+                         const std::vector<std::unique_ptr<Component>> &others)
+        {
+            if (event.is<sf::Event::MouseButtonPressed>())
+            {
+                auto m = event.getIf<sf::Event::MouseButtonPressed>();
+                if (m->button == sf::Mouse::Button::Left)
+                {
+                    sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    if (contains(mouse))
+                    {
+                        isDragging = true;
+                        dragOffset = getPosition() - mouse;
+                    }
+                }
+            }
+            else if (event.is<sf::Event::MouseButtonReleased>())
+            {
+                const auto m = event.getIf<sf::Event::MouseButtonReleased>();
+                if (m->button == sf::Mouse::Button::Left)
+                {
+                    isDragging = false;
+                    if (componentListener)
+                    {
+                        componentListener->onComponentMoved();
+                    }
+                    LOG_INFO("Left mouse released - stop dragging component!");
+                }
+            }
+            else if (event.is<sf::Event::MouseMoved>() && isDragging)
+            {
+                sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                sf::Vector2f candidate = mouse + dragOffset;
+
+                // snap to grid node if available
+                if (auto node = grid.findClosestNode(candidate))
+                    candidate = {node->point.x, node->point.y};
+
+                tryMove(candidate, others);
+            }
+        }
+
+        // próba ruchu; rollback w razie kolizji
+        bool tryMove(const sf::Vector2f &newPos,
+                     const std::vector<std::unique_ptr<Component>> &others)
+        {
+            sf::Vector2f prev = getPosition();
+            setPosition(newPos);
+
+            for (const auto &o : others)
+            {
+                if (o.get() == this)
+                    continue;
+                if (convexPolygonsIntersect(getTransformedPoints(), o->getTransformedPoints()))
+                {
+                    setPosition(prev);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        virtual void detectPointsOnComponent(const std::vector<std::unique_ptr<components::Component>> &components)
+        {
+            constexpr float EPSILON = grid::GRID_SPACING / 20.0f;
+            for (auto &node : grid.getGridNodes())
+            {
+                node.isHighlighted = false;
+                for (const auto &compPtr : components)
+                {
+                    if (!compPtr)
+                        continue;
+                    const auto &comp = *compPtr;
+                    const auto polygon = comp.getTransformedPoints();
+                    if (pointInPolygon({node.point.x, node.point.y}, polygon))
+                    {
+                        node.isHighlighted = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // default contains() używa pointInPolygon na przetransformowanych wierzchołkach
+        virtual bool contains(const sf::Vector2f &p) const
+        {
+            return pointInPolygon(p, getTransformedPoints());
+        }
+
+        // --- interface które implementuje każdy komponent ---
+        virtual void draw(sf::RenderTarget &targ) const = 0;
+        virtual sf::Vector2f getPosition() const = 0;
+        virtual void setPosition(const sf::Vector2f &pos) = 0;
+        virtual std::vector<sf::Vector2f> getTransformedPoints() const = 0;
+        virtual BoxInfo getInfo() const = 0;
+
+        void setListener(ComponentListener *listener) { this->componentListener = listener; }
 
     protected:
-        const grid::Node *findClosestNode(const sf::Vector2f &position) const;
-
-    private:
-        std::vector<sf::Vector2f> getTransformedPoints() const;
-        bool tryMove(const sf::Vector2f &newPos, const std::vector<std::unique_ptr<Component>> &others);
-        const grid::Grid &grid;
-        sf::RectangleShape rectangle;
-        bool isDragging;
+        grid::Grid &grid;
+        bool isDragging = false;
         sf::Vector2f dragOffset;
-        bool isBlocked = false;
+        ComponentListener *componentListener = nullptr;
     };
 } // namespace components

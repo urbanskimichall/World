@@ -36,7 +36,7 @@ void World::create()
             eventHandler.handleEvent(*event, window, scene, viewController);
         }
         fpsCounter.update();
-        window.setTitle("SFML 3 + C++23 - FPS: " + std::to_string(fpsCounter.getFps()) + "");
+        window.setTitle("Boleslaw C++23 - FPS: " + std::to_string(fpsCounter.getFps()) + "");
 
         scene.update(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 

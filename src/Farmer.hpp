@@ -2,13 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 #include "Mover.hpp"
-#include "components/DraggableComponent.hpp"
-#include "components/HomeInfo.hpp"
+#include "components/Component.hpp"
+#include "components/BoxInfo.hpp"
 
-class Farmer : public Mover, public components::DraggableComponent
+class Farmer : public MovableComponent
 {
 public:
-    Farmer(grid::Grid &grid, const sf::Vector2f &initPosition) : components::DraggableComponent(grid)
+    Farmer(grid::Grid &grid, const sf::Vector2f &initPosition) : MovableComponent(grid)
     {
         mover.setFillColor(sf::Color::Blue);
         mover.setPosition(initPosition);
@@ -36,9 +36,9 @@ public:
         points[3] = {bounds.position.x, bounds.position.y + bounds.size.y};
         return points;
     }
-    components::HomeInfo getInfo() const override
+    components::BoxInfo getInfo() const override
     {
-        components::HomeInfo info;
+        components::BoxInfo info;
         info.name = "Farmer";
         info.level = 0;
         info.capacity = 0;

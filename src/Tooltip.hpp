@@ -1,7 +1,8 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <sstream>
-#include "components/HomeInfo.hpp"
+#include "components/BoxInfo.hpp"
 
 class Tooltip
 {
@@ -20,7 +21,7 @@ public:
         text.setFillColor(sf::Color::White);
     }
 
-    void show(const components::HomeInfo &info, sf::Vector2f position)
+    void show(const components::BoxInfo &info, sf::Vector2f position)
     {
         visible = true;
 

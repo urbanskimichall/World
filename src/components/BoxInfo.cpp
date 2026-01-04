@@ -1,8 +1,8 @@
-#include "HomeInfo.hpp"
+#include "BoxInfo.hpp"
 
 namespace components
 {
-    std::string toString(const HomeInfo &info)
+    std::string toString(const BoxInfo &info)
     {
         return "Name: " + info.name + "\n" +
                "Level: " + std::to_string(info.level) + "\n" +

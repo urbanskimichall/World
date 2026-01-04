@@ -1,20 +1,21 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include "ComponentDescriptor.hpp"
-#include "DraggableComponent.hpp"
+#include "Component.hpp"
 #include "../grid/Grid.hpp"
 #include "../utils/Round.hpp"
 #include <array>
-#include "HomeInfo.hpp"
+#include "BoxInfo.hpp"
 
 namespace components
 {
-    class RectangleComponent : public DraggableComponent
+    class RectangleComponent : public Component
     {
     public:
         RectangleComponent(grid::Grid &grid, std::array<sf::Vector2f, 4> points, sf::Color color)
-            : DraggableComponent(grid)
+            : Component(grid)
         {
             std::cout << "Shape position before adjusting: (" << shape.getPosition().x << ", " << shape.getPosition().y << ")\n";
 
@@ -70,9 +71,9 @@ namespace components
             return pts;
         }
 
-        HomeInfo getInfo() const override
+        BoxInfo getInfo() const override
         {
-            HomeInfo info;
+            BoxInfo info;
             info.name = "Rectangle Component";
             info.level = 0;
             info.capacity = 0;

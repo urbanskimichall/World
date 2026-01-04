@@ -2,14 +2,14 @@
 
 #include <SFML/Graphics.hpp>
 #include "TextureManager.hpp"
-#include "components/DraggableComponent.hpp"
-#include "components/HomeInfo.hpp"
+#include "components/Component.hpp"
+#include "components/BoxInfo.hpp"
 
-class HomeTile : public components::DraggableComponent
+class HomeTile : public components::Component
 {
 public:
     HomeTile(grid::Grid &grid, sf::Vector2f initPosition = {0, 0}, std::string filename = "assets/simple_home_level_1.png")
-        : DraggableComponent(grid), sprite(TextureManager::instance().get(filename))
+        : Component(grid), sprite(TextureManager::instance().get(filename))
     {
         sprite.setPosition(initPosition);
         occupiedZone.setPosition({initPosition.x, initPosition.y + sprite.getGlobalBounds().size.y * 3 / 4});
@@ -38,9 +38,9 @@ public:
         points[3] = {bounds.position.x, bounds.position.y + bounds.size.y};
         return points;
     }
-    components::HomeInfo getInfo() const override
+    components::BoxInfo getInfo() const override
     {
-        components::HomeInfo info;
+        components::BoxInfo info;
         info.name = "Simple Home";
         info.level = 1;
         info.capacity = 4;

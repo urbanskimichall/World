@@ -4,7 +4,7 @@
 
 namespace components
 {
-    struct HomeInfo
+    struct BoxInfo
     {
         std::string name;
         int level;
@@ -15,5 +15,5 @@ namespace components
         int builders;
         int soldiers;
     };
-    std::string toString(const HomeInfo &info);
+    std::string toString(const BoxInfo &info);
 }

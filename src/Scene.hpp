@@ -7,7 +7,7 @@
 #include <array>
 #include "grid/GridSpacing.hpp"
 #include "components/RectangleComponent.hpp"
-#include "FieldTile.hpp"
+#include "HomeTile.hpp"
 #include "Tooltip.hpp"
 #include "Farmer.hpp"
 
@@ -41,7 +41,7 @@ public:
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
         updateOccupiedCells();
-        mover.init();
+        // mover.init();
 
         const float tileWidth = 100.f;
         const float tileHeight = 50.f;
@@ -57,15 +57,6 @@ public:
         std::string homeLevel10 = "assets/simple_home_level_10.png";
         std::string fieldLevel1 = "assets/simple_field_level_1.png";
         std::string treeLevel1 = "assets/simple_tree_level_1.png";
-        // fieldsTiles.emplace_back(HomeTile{{200, 50}, homeLevel1});
-        // fieldsTiles.emplace_back(HomeTile(sf::Vector2f{250, 75}, homeLevel2));
-        // fieldsTiles.emplace_back(HomeTile(sf::Vector2f{0, 0}, homeLevel1));
-        // fieldsTiles.emplace_back(HomeTile({50, 25}, homeLevel3));
-        // fieldsTiles.emplace_back(HomeTile({300, 50}, fieldLevel1));
-        // fieldsTiles.emplace_back(HomeTile({150, 75}, treeLevel1));
-        // fieldsTiles.emplace_back(HomeTile({450, 75}, homeLevel7));
-
-        // HomeTile homeLevel7_({450, 75}, homeLevel7);
 
         std::array<sf::Vector2f, 4> parallerogramHomeLevel7 = {
             sf::Vector2f(450.f, 200.f),
@@ -110,10 +101,16 @@ public:
     void update(const sf::Vector2f &mouseWorld)
     {
         grid.highlightRhombusUnderMouse(mouseWorld);
-        mover.updateMover(grid.getPath(), grid.getRhomusCentersPoints());
 
+        for (auto &component : componentManager.getComponents())
+        {
+            if ((static_cast<int>(component->capabilities()) & static_cast<int>(components::Capability::Movable)) != 0)
+            {
+                static_cast<MovableComponent &>(*component).updateMover(grid.getPath(), grid.getRhomusCentersPoints());
+            }
+        }
 
-        if (auto *c = componentManager.getHoveredComponent(mouseWorld))
+        if (const auto *c = componentManager.getHoveredComponent(mouseWorld))
         {
             tooltip.show(c->getInfo(), mouseWorld);
         }
@@ -130,12 +127,7 @@ public:
         sf::FloatRect bounds = getViewBounds(target);
         // grid.draw(target, bounds);
 
-        mover.draw(target);
         farmer.draw(target);
-        // for (const auto &fieldTile : fieldsTiles)
-        // {
-        //     fieldTile.draw(target);
-        // }
         tooltip.draw(target);
     }
 
@@ -176,10 +168,6 @@ private:
 
     grid::Grid grid;
     components::ComponentManager componentManager;
-    Mover mover;
     Farmer farmer{grid, {10.f, 300.f}};
-
     Tooltip tooltip;
-
-    std::vector<HomeTile> fieldsTiles;
 };

@@ -8,6 +8,8 @@
 #include "grid/GridSpacing.hpp"
 #include "components/RectangleComponent.hpp"
 #include "FieldTile.hpp"
+#include "Tooltip.hpp"
+#include "Farmer.hpp"
 
 class Scene
 {
@@ -34,9 +36,9 @@ public:
             sf::Vector2f(540.f, 280.f),
             sf::Vector2f(420.f, 280.f)};
 
-        //componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
-        //componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
-        //componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
+        // componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
+        // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
+        // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
         updateOccupiedCells();
         mover.init();
@@ -101,12 +103,24 @@ public:
         componentManager.emplaceComponent<HomeTile>(homeTile14);
         HomeTile homeTile15(grid, {750, 375}, homeLevel5);
         componentManager.emplaceComponent<HomeTile>(homeTile15);
+        Farmer farmer1(grid, {10.f, 400.f});
+        componentManager.emplaceComponent<Farmer>(farmer1);
     }
 
     void update(const sf::Vector2f &mouseWorld)
     {
         grid.highlightRhombusUnderMouse(mouseWorld);
         mover.updateMover(grid.getPath(), grid.getRhomusCentersPoints());
+
+
+        if (auto *c = componentManager.getHoveredComponent(mouseWorld))
+        {
+            tooltip.show(c->getInfo(), mouseWorld);
+        }
+        else
+        {
+            tooltip.hide();
+        }
     }
 
     void draw(sf::RenderWindow &target) const
@@ -114,13 +128,15 @@ public:
         componentManager.draw(target);
 
         sf::FloatRect bounds = getViewBounds(target);
-        //grid.draw(target, bounds);
+        // grid.draw(target, bounds);
 
         mover.draw(target);
+        farmer.draw(target);
         // for (const auto &fieldTile : fieldsTiles)
         // {
         //     fieldTile.draw(target);
         // }
+        tooltip.draw(target);
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -161,6 +177,9 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Mover mover;
+    Farmer farmer{grid, {10.f, 300.f}};
+
+    Tooltip tooltip;
 
     std::vector<HomeTile> fieldsTiles;
 };

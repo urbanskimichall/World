@@ -59,7 +59,7 @@ public:
         target.draw(mover);
     }
 
-private:
+protected:
     uint32_t currentSegment = 0; // which segment (path[i] -> path[i+1]) we are on
     float segmentProgress = 0.f; // 0..1 interpolation along the segment
     float moveSpeed = 100.f;     // pixels per second

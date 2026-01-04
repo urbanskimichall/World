@@ -6,6 +6,7 @@
 #include <SFML/Window/Event.hpp>
 #include "CollisionDetection.hpp"
 #include "ComponentListener.hpp"
+#include "HomeInfo.hpp"
 
 namespace components
 {
@@ -127,6 +128,8 @@ namespace components
         virtual sf::Vector2f getPosition() const = 0;
         virtual void setPosition(const sf::Vector2f &pos) = 0;
         virtual std::vector<sf::Vector2f> getTransformedPoints() const = 0;
+        virtual HomeInfo getInfo() const = 0;
+
         void setListener(ComponentListener *listener) { this->componentListener = listener; }
 
     protected:

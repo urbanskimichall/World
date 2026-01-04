@@ -31,6 +31,16 @@ namespace components
         void draw(sf::RenderTarget &target) const;
         std::vector<RectComponentDescriptor> getAllDescriptors() const;
         const std::vector<std::unique_ptr<DraggableComponent>> &getComponents() const { return components; }
+        
+        components::DraggableComponent* getHoveredComponent(sf::Vector2f mouseWorld) const
+        {
+            for (auto &c : components)
+            {
+                if (c->contains(mouseWorld))
+                    return c.get();
+            }
+            return nullptr;
+        }
 
     private:
         void sortComponentsByYPosition()

@@ -31,8 +31,8 @@ endif()
 add_executable(${PROJECT_NAME}
     main.cpp grid/Grid.cpp grid/Grid.hpp grid/GridGenerator.cpp grid/GridRenderer.cpp grid/GridSelector.cpp
      World.hpp World.cpp components/Component.cpp components/Component.hpp
-    components/ComponentManager.cpp components/ComponentManager.hpp
-    grid/Pathfinder.cpp
+    components/ComponentManager.cpp components/ComponentManager.hpp 
+    grid/Pathfinder.cpp grid/Pathfinder.hpp components/HomeInfo.cpp components/HomeInfo.hpp
 )
 
 # 🔹 Ścieżki nagłówków

@@ -5,6 +5,8 @@
 #include "DraggableComponent.hpp"
 #include "../grid/Grid.hpp"
 #include "../utils/Round.hpp"
+#include <array>
+#include "HomeInfo.hpp"
 
 namespace components
 {
@@ -32,7 +34,7 @@ namespace components
                 auto node = grid.findClosestNode(localPoints[i]);
                 if (node)
                 {
-                    localPoints[i] = {static_cast<float>(node->point.x ), static_cast<float>(node->point.y)};
+                    localPoints[i] = {static_cast<float>(node->point.x), static_cast<float>(node->point.y)};
                 }
             }
 
@@ -66,6 +68,20 @@ namespace components
             for (std::size_t i = 0; i < pts.size(); ++i)
                 pts[i] = shape.getTransform().transformPoint(shape.getPoint(static_cast<uint32_t>(i)));
             return pts;
+        }
+
+        HomeInfo getInfo() const override
+        {
+            HomeInfo info;
+            info.name = "Rectangle Component";
+            info.level = 0;
+            info.capacity = 0;
+            info.occupants = 0;
+            info.happiness = 0;
+            info.farmers = 0;
+            info.builders = 0;
+            info.soldiers = 0;
+            return info;
         }
 
     private:

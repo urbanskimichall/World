@@ -31,6 +31,7 @@ namespace grid
         const auto &getPath() const {return model.path;}
         const Node *findClosestNode(const sf::Vector2f &pos) const { return selector.findClosestNode(model, pos); }
         uint32_t highlightRhombusUnderMouse(const sf::Vector2f &mousePos) { return selector.highlightRhombusUnderMouse(model, mousePos); }
+        
         void selectRhombusAtMouse(const sf::Vector2f &mousePos)
         {
             const uint32_t index =

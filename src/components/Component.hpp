@@ -155,6 +155,7 @@ namespace components
         virtual void setPosition(const sf::Vector2f &pos) = 0;
         virtual std::vector<sf::Vector2f> getTransformedPoints() const = 0;
         virtual BoxInfo getInfo() const = 0;
+        virtual sf::Vector2f getSize() const = 0;
 
         void setListener(ComponentListener *listener) { this->componentListener = listener; }
         uint16_t getId() const { return id; }

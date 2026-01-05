@@ -97,6 +97,11 @@ public:
         info.soldiers = 0;
         return info;
     }
+    sf::Vector2f getSize() const override
+    {
+        sf::FloatRect bounds = mover.getGlobalBounds();
+        return {bounds.size.x, bounds.size.y};
+    }
 
 protected:
     uint32_t currentSegment = 0; // which segment (path[i] -> path[i+1]) we are on

@@ -8,10 +8,11 @@
 class Farmer : public MovableComponent
 {
 public:
-    Farmer(grid::Grid &grid, uint16_t id, const sf::Vector2f &initPosition) : MovableComponent(grid, id)
+    Farmer(grid::Grid &grid, uint16_t id, const sf::Vector2f &initPosition, uint16_t homeId)
+    : MovableComponent(grid, id), homeId(homeId)
     {
         mover.setFillColor(sf::Color::Blue);
-        mover.setPosition(initPosition);
+        mover.setPosition(initPosition + sf::Vector2f{10.f, 10.f});
     }
 
     void draw(sf::RenderTarget &target) const override
@@ -49,4 +50,6 @@ public:
         info.soldiers = 0;
         return info;
     }
+    private:
+    uint16_t homeId;
 };

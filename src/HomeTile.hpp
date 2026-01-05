@@ -51,6 +51,10 @@ public:
         info.soldiers = 1;
         return info;
     }
+    sf::Vector2f getSize() const override
+    {
+        return {sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y};
+    }
 
 private:
     sf::Sprite sprite;

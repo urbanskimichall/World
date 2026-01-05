@@ -8,7 +8,7 @@
 class MovableComponent : public components::Component
 {
 public:
-    MovableComponent(grid::Grid &grid) : components::Component(grid) {}
+    MovableComponent(grid::Grid &grid, uint16_t id) : components::Component(grid, id) {}
     void init()
     {
         mover.setFillColor(sf::Color::White);

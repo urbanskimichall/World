@@ -8,8 +8,8 @@
 class HomeTile : public components::Component
 {
 public:
-    HomeTile(grid::Grid &grid, sf::Vector2f initPosition = {0, 0}, std::string filename = "assets/simple_home_level_1.png")
-        : Component(grid), sprite(TextureManager::instance().get(filename))
+    HomeTile(grid::Grid &grid, uint16_t id, sf::Vector2f initPosition = {0, 0}, std::string filename = "assets/simple_home_level_1.png")
+        : Component(grid, id), sprite(TextureManager::instance().get(filename))
     {
         sprite.setPosition(initPosition);
         occupiedZone.setPosition({initPosition.x, initPosition.y + sprite.getGlobalBounds().size.y * 3 / 4});

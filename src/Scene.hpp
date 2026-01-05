@@ -63,39 +63,41 @@ public:
             sf::Vector2f(540.f, 150.f),
             sf::Vector2f(630.f, 200.f),
             sf::Vector2f(530.f, 240.f)};
-        componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramHomeLevel7, sf::Color::Green);
-        HomeTile homeTile(grid, {450, 200}, homeLevel7);
+        componentManager.emplaceComponent<components::RectangleComponent>(grid, 0, parallerogramHomeLevel7, sf::Color::Green);
+        HomeTile homeTile(grid, 0, {450, 200}, homeLevel7);
         componentManager.emplaceComponent<HomeTile>(homeTile);
-        HomeTile homeTile2(grid, {200, 50}, homeLevel1);
+        HomeTile homeTile2(grid, 1, {200, 50}, homeLevel1);
         componentManager.emplaceComponent<HomeTile>(homeTile2);
-        HomeTile homeTile3(grid, {250, 75}, homeLevel2);
+        HomeTile homeTile3(grid, 2, {250, 75}, homeLevel2);
         componentManager.emplaceComponent<HomeTile>(homeTile3);
-        HomeTile homeTile4(grid, {0, 0}, homeLevel4);
+        HomeTile homeTile4(grid, 3, {0, 0}, homeLevel4);
         componentManager.emplaceComponent<HomeTile>(homeTile4);
-        HomeTile homeTile5(grid, {50, 25}, homeLevel5);
+        HomeTile homeTile5(grid, 4, {50, 25}, homeLevel5);
         componentManager.emplaceComponent<HomeTile>(homeTile5);
-        HomeTile homeTile6(grid, {300, 50}, fieldLevel1);
+        HomeTile homeTile6(grid, 5, {300, 50}, fieldLevel1);
         componentManager.emplaceComponent<HomeTile>(homeTile6);
-        HomeTile homeTile7(grid, {150, 75}, treeLevel1);
+        HomeTile homeTile7(grid, 6, {150, 75}, treeLevel1);
         componentManager.emplaceComponent<HomeTile>(homeTile7);
-        HomeTile homeTile8(grid, {600, 300}, homeLevel8);
+        HomeTile homeTile8(grid, 7, {600, 300}, homeLevel8);
         componentManager.emplaceComponent<HomeTile>(homeTile8);
-        HomeTile homeTile9(grid, {700, 350}, homeLevel9);
+        HomeTile homeTile9(grid, 8, {700, 350}, homeLevel9);
         componentManager.emplaceComponent<HomeTile>(homeTile9);
-        HomeTile homeTile10(grid, {800, 400}, homeLevel10);
+        HomeTile homeTile10(grid, 9, {800, 400}, homeLevel10);
         componentManager.emplaceComponent<HomeTile>(homeTile10);
-        HomeTile homeTile11(grid, {400, 150}, homeLevel6);
+        HomeTile homeTile11(grid, 10, {400, 150}, homeLevel6);
         componentManager.emplaceComponent<HomeTile>(homeTile11);
-        HomeTile homeTile12(grid, {350, 125}, homeLevel3);
+        HomeTile homeTile12(grid, 11, {350, 125}, homeLevel3);
         componentManager.emplaceComponent<HomeTile>(homeTile12);
-        HomeTile homeTile13(grid, {500, 250}, homeLevel2);
+        HomeTile homeTile13(grid, 12, {500, 250}, homeLevel2);
         componentManager.emplaceComponent<HomeTile>(homeTile13);
-        HomeTile homeTile14(grid, {550, 275}, homeLevel1);
+        HomeTile homeTile14(grid, 13, {550, 275}, homeLevel1);
         componentManager.emplaceComponent<HomeTile>(homeTile14);
-        HomeTile homeTile15(grid, {750, 375}, homeLevel5);
+        HomeTile homeTile15(grid, 14, {750, 375}, homeLevel5);
         componentManager.emplaceComponent<HomeTile>(homeTile15);
-        Farmer farmer1(grid, {10.f, 400.f});
+        Farmer farmer1(grid, 15, {10.f, 400.f});
         componentManager.emplaceComponent<Farmer>(farmer1);
+        Farmer farmer2(grid, 16, {60.f, 450.f});
+        componentManager.emplaceComponent<Farmer>(farmer2);
     }
 
     void update(const sf::Vector2f &mouseWorld)
@@ -126,8 +128,6 @@ public:
 
         sf::FloatRect bounds = getViewBounds(target);
         // grid.draw(target, bounds);
-
-        farmer.draw(target);
         tooltip.draw(target);
     }
 
@@ -168,6 +168,5 @@ private:
 
     grid::Grid grid;
     components::ComponentManager componentManager;
-    Farmer farmer{grid, {10.f, 300.f}};
     Tooltip tooltip;
 };

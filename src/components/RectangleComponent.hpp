@@ -14,8 +14,8 @@ namespace components
     class RectangleComponent : public Component
     {
     public:
-        RectangleComponent(grid::Grid &grid, std::array<sf::Vector2f, 4> points, sf::Color color)
-            : Component(grid)
+        RectangleComponent(grid::Grid &grid, uint16_t id, std::array<sf::Vector2f, 4> points, sf::Color color)
+            : Component(grid, id)
         {
             std::cout << "Shape position before adjusting: (" << shape.getPosition().x << ", " << shape.getPosition().y << ")\n";
 

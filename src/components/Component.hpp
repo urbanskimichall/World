@@ -51,7 +51,7 @@ namespace components
     class Component
     {
     public:
-        explicit Component(grid::Grid &grid) : grid(grid) {}
+        explicit Component(grid::Grid &grid, uint16_t id) : grid(grid), id(id) {}
         virtual ~Component() = default;
 
         virtual Capability capabilities() const
@@ -86,7 +86,7 @@ namespace components
                     {
                         componentListener->onComponentMoved();
                     }
-                    LOG_INFO("Left mouse released - stop dragging component!");
+                    //LOG_INFO("Left mouse released - stop dragging component!");
                 }
             }
             else if (event.is<sf::Event::MouseMoved>() && isDragging)
@@ -157,9 +157,11 @@ namespace components
         virtual BoxInfo getInfo() const = 0;
 
         void setListener(ComponentListener *listener) { this->componentListener = listener; }
+        uint16_t getId() const { return id; }
 
     protected:
         grid::Grid &grid;
+        uint16_t id;
         bool isDragging = false;
         sf::Vector2f dragOffset;
         ComponentListener *componentListener = nullptr;

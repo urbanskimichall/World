@@ -27,6 +27,10 @@ public:
     {
         return mover.getPosition();
     }
+    uint16_t getHomeId() const
+    {
+        return homeId;
+    }
     std::vector<sf::Vector2f> getTransformedPoints() const override
     {
         sf::FloatRect bounds = mover.getGlobalBounds();

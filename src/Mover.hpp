@@ -5,6 +5,13 @@
 #include "utils/Point.hpp"
 #include "components/Component.hpp"
 
+enum class MovementStep : uint8_t
+{
+    ONGOING = 0,
+    END_REACHED = 1,
+    INVALID_PATH = 0xFF
+};
+
 class MovableComponent : public components::Component
 {
 public:
@@ -19,13 +26,18 @@ public:
         return components::Capability::Draggable | components::Capability::Movable;
     }
 
-    void updateMover(const std::vector<uint32_t> &path,
+    MovementStep updateMover(const std::vector<uint32_t> &path,
                      const std::vector<utils::Point> &centers)
     {
         float dt = clock.restart().asSeconds();
-        if (path.size() < 2 || currentSegment >= path.size() - 1)
+        if (path.size() < 2 || centers.size() == 0)
         {
-            return; // no movement or reached end
+            LOG_WARN("!!! Invalid path for mover ID: ", id);
+            return MovementStep::INVALID_PATH;
+        }
+        if(currentSegment >= path.size() - 1)
+        {
+            return MovementStep::END_REACHED;
         }
 
         // Get segment endpoints
@@ -38,7 +50,7 @@ public:
         {
             currentSegment++;
             segmentProgress = 0.f;
-            return;
+            return MovementStep::ONGOING;
         }
 
         // Increase progress based on time and speed
@@ -61,6 +73,7 @@ public:
             const float y = p0.y + (p1.y - p0.y) * segmentProgress;
             mover.setPosition({x, y});
         }
+        return MovementStep::ONGOING;
     }
     void draw(sf::RenderTarget &target) const override
     {

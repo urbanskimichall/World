@@ -18,11 +18,11 @@ public:
             const auto &m = *event.getIf<sf::Event::MouseButtonPressed>();
             if (m.button == sf::Mouse::Button::Left)
             {
-                scene.getGrid().selectRhombusAtMouse(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+                scene.selectRhombusAtMouse(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
             }
             if (m.button == sf::Mouse::Button::Right)
             {
-                scene.getGrid().unselectRhombusAtMouse(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+                scene.unselectRhombusAtMouse(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
                 camera.beginPan(window);
             }
         }
@@ -37,7 +37,15 @@ public:
         {
             camera.updatePan(window);
         }
-
+        else if (event.is<sf::Event::KeyPressed>())
+        {
+            const auto &m = *event.getIf<sf::Event::KeyPressed>();
+            if (m.code == sf::Keyboard::Key::X)
+            {
+                LOG_INFO("Generating paths...");
+                scene.generatePaths();
+            }
+        }
         scene.handleEvent(event, window);
     }
 };

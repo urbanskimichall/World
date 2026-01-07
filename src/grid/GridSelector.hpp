@@ -63,5 +63,18 @@ namespace grid
                 }
             }
         }
+
+        std::optional<uint32_t> getRhombiIndexByPosition(const GridModel &model, const sf::Vector2f &position) const
+        {
+            for (uint32_t i = 0; i < model.rhombi.size(); ++i)
+            {
+                const Rhombus &r = model.rhombi[i];
+                if (AreaSelector::pointInConvexQuad(r, position))
+                {
+                    return i;
+                }
+            }
+            return std::nullopt;
+        }
     };
 }

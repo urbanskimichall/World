@@ -8,11 +8,10 @@ struct PathContext
 {
     uint32_t startIndex;
     uint32_t goalIndex;
-    uint16_t moverId;
+    std::vector<uint32_t> path;
 };
 
 struct PathManager
 {
-                    // key: (startIndex, goalIndex, moverId), value: path as vector of node indices
-    std::map<PathContext, std::vector<uint32_t>> paths;
+    std::map<uint16_t, PathContext> paths;
 };

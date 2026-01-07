@@ -101,6 +101,15 @@ public:
         componentManager.emplaceComponent<Farmer>(farmer2);
     }
 
+    void selectRhombusAtMouse(const sf::Vector2f &mouseWorld)
+    {
+        grid.selectRhombusAtMouse(mouseWorld);
+    }
+    void unselectRhombusAtMouse(const sf::Vector2f &mouseWorld)
+    {
+        grid.unselectRhombusAtMouse(mouseWorld);
+    }
+
     void update(const sf::Vector2f &mouseWorld)
     {
         grid.highlightRhombusUnderMouse(mouseWorld);
@@ -109,7 +118,15 @@ public:
         {
             if ((static_cast<int>(component->capabilities()) & static_cast<int>(components::Capability::Movable)) != 0)
             {
-                static_cast<MovableComponent &>(*component).updateMover(grid.getPath(), grid.getRhomusCentersPoints());
+                const auto pathContextIt = pathManager.paths.find(static_cast<MovableComponent &>(*component).getId());
+                if (pathContextIt != pathManager.paths.end())
+                {
+                    const auto movementStep = static_cast<MovableComponent &>(*component).updateMover(pathContextIt->second.path, grid.getRhomusCentersPoints());
+                    if(movementStep == MovementStep::END_REACHED)
+                    {
+                        //LOG_INFO("Path completed for component ID: ", static_cast<MovableComponent &>(*component).getId());
+                    }
+                }
             }
         }
 
@@ -136,8 +153,30 @@ public:
     {
         componentManager.handleEvent(event, window);
     }
-
-    grid::Grid &getGrid() { return grid; }
+    void generatePaths()
+    {
+        for (auto &component : componentManager.getComponents())
+        {
+            if ((static_cast<int>(component->capabilities()) & static_cast<int>(components::Capability::Movable)) != 0)
+            {
+                const uint32_t componentId = static_cast<MovableComponent &>(*component).getId();
+                const auto componentPos = static_cast<MovableComponent &>(*component).getPosition();
+                if (const auto optIndex = grid.getRhombiIndexByPosition(componentPos))
+                {
+                    const uint32_t startIndex = *optIndex;
+                    const uint32_t goalIndex = 42; // hardcoded for testing
+                    const auto path = grid::aStarFindPath(startIndex, goalIndex, grid.getRhomusCenters(), grid.getModel().neighborIndices, grid.getModel().occupiedRhomus);
+                    PathContext pathContext{startIndex, goalIndex, path};
+                    pathManager.paths.insert({componentId, pathContext});
+                    LOG_INFO("Component ID: ", componentId, " Start index: ", startIndex, " Goal index: ", goalIndex, " Path length: ", path.size());
+                }
+                else
+                {
+                    LOG_WARN("!!! Component ID: ", componentId, " is not on any rhombus center.");
+                }
+            }
+        }
+    }
 
 private:
     sf::FloatRect getViewBounds(const sf::RenderWindow &window) const

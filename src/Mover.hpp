@@ -26,11 +26,22 @@ public:
         return components::Capability::Draggable | components::Capability::Movable;
     }
 
-    MovementStep updateMover(const std::vector<uint32_t> &path,
-                     const std::vector<utils::Point> &centers)
+    void setPath(std::vector<uint32_t> newPath)
+    {
+        path = std::move(newPath);
+        currentSegment = 0;
+        segmentProgress = 0.f;
+    }
+
+    bool hasActivePath() const
+    {
+        return path.size() > 1;
+    }
+
+    MovementStep updateMover(const std::vector<utils::Point> &centers)
     {
         float dt = clock.restart().asSeconds();
-        if (path.size() < 2 || centers.size() == 0)
+        if (not hasActivePath() || centers.size() == 0)
         {
             LOG_WARN("!!! Invalid path for mover ID: ", id);
             return MovementStep::INVALID_PATH;
@@ -117,6 +128,7 @@ public:
     }
 
 protected:
+    std::vector<uint32_t> path;
     uint32_t currentSegment = 0; // which segment (path[i] -> path[i+1]) we are on
     float segmentProgress = 0.f; // 0..1 interpolation along the segment
     float moveSpeed = 100.f;     // pixels per second

@@ -10,12 +10,12 @@
 #include "HomeTile.hpp"
 #include "Tooltip.hpp"
 #include "Farmer.hpp"
-#include "PathManager.hpp"
+#include "MovementSystem.hpp"
 
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), movementSystem(grid) {}
 
     void init()
     {
@@ -73,16 +73,16 @@ public:
         // componentManager.emplaceComponent<HomeTile>(homeTile3);
         // HomeTile homeTile4(grid, 3, {0, 0}, homeLevel4);
         // componentManager.emplaceComponent<HomeTile>(homeTile4);
-        // HomeTile homeTile5(grid, 4, {50, 25}, homeLevel5);
-        // componentManager.emplaceComponent<HomeTile>(homeTile5);
+        HomeTile homeTile5(grid, 4, {50, 25}, homeLevel5);
+        componentManager.emplaceComponent<HomeTile>(homeTile5);
         // HomeTile homeTile6(grid, 5, {300, 50}, fieldLevel1);
         // componentManager.emplaceComponent<HomeTile>(homeTile6);
         // HomeTile homeTile7(grid, 6, {150, 75}, treeLevel1);
         // componentManager.emplaceComponent<HomeTile>(homeTile7);
         // HomeTile homeTile8(grid, 7, {600, 300}, homeLevel8);
         // componentManager.emplaceComponent<HomeTile>(homeTile8);
-        // HomeTile homeTile9(grid, 8, {700, 350}, homeLevel9);
-        // componentManager.emplaceComponent<HomeTile>(homeTile9);
+        HomeTile homeTile9(grid, 8, {700, 350}, homeLevel9);
+        componentManager.emplaceComponent<HomeTile>(homeTile9);
         HomeTile homeTile10(grid, 9, {800, 400}, homeLevel10);
         componentManager.emplaceComponent<HomeTile>(homeTile10);
         HomeTile homeTile11(grid, 10, {400, 150}, homeLevel6);
@@ -96,9 +96,17 @@ public:
         // HomeTile homeTile15(grid, 14, {750, 375}, homeLevel5);
         // componentManager.emplaceComponent<HomeTile>(homeTile15);
         Farmer farmer1(grid, 15, homeTile10.getPosition() + sf::Vector2f{homeTile10.getSize().x / 2, homeTile10.getSize().y - 15}, homeTile10.getId());
-        componentManager.emplaceComponent<Farmer>(farmer1);
+        auto &farmer01 = componentManager.emplaceComponent<Farmer>(farmer1);
         Farmer farmer2(grid, 16, homeTile11.getPosition() + sf::Vector2f{homeTile11.getSize().x / 2, homeTile11.getSize().y - 15}, homeTile11.getId());
-        componentManager.emplaceComponent<Farmer>(farmer2);
+        auto &farmer02 = componentManager.emplaceComponent<Farmer>(farmer2);
+        Farmer farmer3(grid, 17, homeTile5.getPosition() + sf::Vector2f{homeTile5.getSize().x / 2, homeTile5.getSize().y - 15}, homeTile5.getId());
+        auto &farmer03 = componentManager.emplaceComponent<Farmer>(farmer3);
+        
+        LOG_INFO("Scene initialized.");
+        movementSystem.addMover(farmer01, {40, 188, 900, 20});
+        movementSystem.addMover(farmer02, {120, 188, 345, 520});
+        movementSystem.addMover(farmer03, {10, 256, 512, 1245});
+        LOG_INFO("Movers added to MovementSystem.");
     }
 
     void selectRhombusAtMouse(const sf::Vector2f &mouseWorld)
@@ -114,21 +122,7 @@ public:
     {
         grid.highlightRhombusUnderMouse(mouseWorld);
 
-        for (auto &component : componentManager.getComponents())
-        {
-            if ((static_cast<int>(component->capabilities()) & static_cast<int>(components::Capability::Movable)) != 0)
-            {
-                const auto pathContextIt = pathManager.paths.find(static_cast<MovableComponent &>(*component).getId());
-                if (pathContextIt != pathManager.paths.end())
-                {
-                    const auto movementStep = static_cast<MovableComponent &>(*component).updateMover(pathContextIt->second.path, grid.getRhomusCentersPoints());
-                    if(movementStep == MovementStep::END_REACHED)
-                    {
-                        //LOG_INFO("Path completed for component ID: ", static_cast<MovableComponent &>(*component).getId());
-                    }
-                }
-            }
-        }
+        movementSystem.update();
 
         if (const auto *c = componentManager.getHoveredComponent(mouseWorld))
         {
@@ -152,30 +146,6 @@ public:
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
     {
         componentManager.handleEvent(event, window);
-    }
-    void generatePaths()
-    {
-        for (auto &component : componentManager.getComponents())
-        {
-            if ((static_cast<int>(component->capabilities()) & static_cast<int>(components::Capability::Movable)) != 0)
-            {
-                const uint32_t componentId = static_cast<MovableComponent &>(*component).getId();
-                const auto componentPos = static_cast<MovableComponent &>(*component).getPosition();
-                if (const auto optIndex = grid.getRhombiIndexByPosition(componentPos))
-                {
-                    const uint32_t startIndex = *optIndex;
-                    const uint32_t goalIndex = 42; // hardcoded for testing
-                    const auto path = grid::aStarFindPath(startIndex, goalIndex, grid.getRhomusCenters(), grid.getModel().neighborIndices, grid.getModel().occupiedRhomus);
-                    PathContext pathContext{startIndex, goalIndex, path};
-                    pathManager.paths.insert({componentId, pathContext});
-                    LOG_INFO("Component ID: ", componentId, " Start index: ", startIndex, " Goal index: ", goalIndex, " Path length: ", path.size());
-                }
-                else
-                {
-                    LOG_WARN("!!! Component ID: ", componentId, " is not on any rhombus center.");
-                }
-            }
-        }
     }
 
 private:
@@ -209,5 +179,5 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Tooltip tooltip;
-    PathManager pathManager;
+    MovementSystem movementSystem;
 };

@@ -42,8 +42,8 @@ public:
             const auto &m = *event.getIf<sf::Event::KeyPressed>();
             if (m.code == sf::Keyboard::Key::X)
             {
-                LOG_INFO("Generating paths...");
-                scene.generatePaths();
+                // LOG_INFO("Generating paths...");
+                // scene.generatePaths();
             }
         }
         scene.handleEvent(event, window);

@@ -36,15 +36,22 @@ public:
             return;
         }
         const uint32_t startIndex = *startOpt;
-        uint32_t goalIndex = pathContexts[&mover].destinationIndices[pathContexts[&mover].currentStep];
+        const auto& destinationIndices = pathContexts[&mover].destinationIndices;
+        uint32_t& currentStep = pathContexts[&mover].currentStep;
+        if(destinationIndices.empty())
+        {
+            LOG_WARN("No destination indices set for mover ID: ", mover.getId());
+            return;
+        }
+        uint32_t goalIndex = destinationIndices[currentStep];
         goalIndex = checkIfGoalIndexIsNotOccupiedAndIfGolaIndexIsNotValidFindTheClosestFirstValid(goalIndex);
-        pathContexts[&mover].currentStep = (pathContexts[&mover].currentStep + 1) % pathContexts[&mover].destinationIndices.size();
-        const auto path = grid::aStarFindPath(startIndex, goalIndex, grid.getRhomusCenters(), grid.getModel().neighborIndices, grid.getModel().occupiedRhomus);
+        currentStep = (currentStep + 1) % destinationIndices.size();
+        const auto path = grid::aStarFindPath(startIndex, goalIndex, grid);
 
         mover.setPath(path);
     }
 
-    uint32_t checkIfGoalIndexIsNotOccupiedAndIfGolaIndexIsNotValidFindTheClosestFirstValid(uint32_t &goalIndex)
+    uint32_t checkIfGoalIndexIsNotOccupiedAndIfGolaIndexIsNotValidFindTheClosestFirstValid(uint32_t goalIndex)
     {
         const auto &occupiedRhomus = grid.getModel().occupiedRhomus;
         const auto &neighborIndices = grid.getModel().neighborIndices;

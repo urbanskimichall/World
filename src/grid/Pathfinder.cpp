@@ -2,14 +2,14 @@
 
 namespace grid
 {
-    std::vector<uint32_t> aStarFindPath(
-        uint32_t startIndex,
-        uint32_t goalIndex,
-        const std::vector<sf::Vector2f> &rhombusCenters,
-        const std::vector<std::vector<uint32_t>> &neighborIndices,
-        const std::vector<uint32_t> &occupiedRhomus)
+    std::vector<uint32_t> aStarFindPath(uint32_t startIndex, uint32_t goalIndex, const Grid &grid)
     {
         const float INF = std::numeric_limits<float>::infinity();
+
+        const auto &rhombusCenters = grid.getRhomusCenters();
+        const auto &neighborIndices = grid.getModel().neighborIndices;
+        const auto &occupiedRhomus = grid.getModel().occupiedRhomus;
+
         size_t N = rhombusCenters.size();
 
         std::vector<float> gScore(N, INF);

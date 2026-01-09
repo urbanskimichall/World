@@ -3,7 +3,6 @@
 #include "GridGenerator.hpp"
 #include "GridRenderer.hpp"
 #include "GridSelector.hpp"
-#include "Pathfinder.hpp"
 #include "../Logger.hpp"
 #include <unordered_set>
 #include <queue>

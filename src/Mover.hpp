@@ -8,8 +8,9 @@
 enum class MovementStep : uint8_t
 {
     ONGOING = 0,
-    CHECKPOINT_REACHED = 1,
-    END_REACHED = 2,
+    WAITING,
+    CHECKPOINT_REACHED,
+    END_REACHED,
     INVALID_PATH = 0xFF
 };
 
@@ -42,15 +43,32 @@ public:
     MovementStep updateMover(const std::vector<utils::Point> &centers)
     {
         float dt = clock.restart().asSeconds();
+
+        if (movementState == MovementStep::WAITING)
+        {
+            waitElapsed += dt;
+
+            if (waitElapsed >= 1)
+            {
+                waitElapsed = 0.f;
+                movementState = MovementStep::END_REACHED;
+            }
+
+            return movementState;
+        }
+
         if (not hasActivePath() || centers.size() == 0)
         {
             LOG_WARN("!!! Mover::updateMover Invalid path for mover ID: ", id, " currentSegment ", currentSegment, " hasActivePath() ",
                      hasActivePath(), " centers.size() ", centers.size(), " !!!");
-            return MovementStep::INVALID_PATH;
+            movementState = MovementStep::INVALID_PATH;
+            return movementState;
         }
+
         if (currentSegment >= path.size() - 1)
         {
-            return MovementStep::END_REACHED;
+            movementState = MovementStep::WAITING;
+            return movementState;
         }
 
         // Get segment endpoints
@@ -78,15 +96,15 @@ public:
 
             // Snap to end point for visual accuracy
             mover.setPosition({p1.x, p1.y});
-            return MovementStep::CHECKPOINT_REACHED;
+            movementState = MovementStep::CHECKPOINT_REACHED;
+            return movementState;
         }
-        else
-        {
-            // Interpolate position along current segment
-            const float x = p0.x + (p1.x - p0.x) * segmentProgress;
-            const float y = p0.y + (p1.y - p0.y) * segmentProgress;
-            mover.setPosition({x, y});
-        }
+
+        // Interpolate position along current segment
+        const float x = p0.x + (p1.x - p0.x) * segmentProgress;
+        const float y = p0.y + (p1.y - p0.y) * segmentProgress;
+        mover.setPosition({x, y});
+        movementState = MovementStep::ONGOING;
         return MovementStep::ONGOING;
     }
 
@@ -147,4 +165,6 @@ protected:
     float moveSpeed = 100.f;     // pixels per second
     sf::Clock clock;
     sf::CircleShape mover{4.f};
+    MovementStep movementState = MovementStep::INVALID_PATH;
+    float waitElapsed = 0.f;
 };

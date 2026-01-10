@@ -36,42 +36,10 @@ public:
             }
             return validIndices;
         }();
-        
+
         pathContexts[&mover] = PathContext{0, validDestinations};
 
         setDestination(mover);
-    }
-
-    void setDestination(MovableComponent &mover, bool shouldRecalculatePath = false)
-    {
-        auto startPosition = mover.getPosition();
-        auto startOpt = grid.getRhombiIndexByPosition(startPosition);
-        if (!startOpt)
-        {
-            LOG_WARN("Mover ID: ", mover.getId(), " is not on a valid rhombus. Cannot set destination.");
-            return;
-        }
-        const uint32_t startIndex = *startOpt;
-        const auto &destinationIndices = pathContexts[&mover].destinationIndices;
-        uint32_t &currentStep = pathContexts[&mover].currentStep;
-        if (shouldRecalculatePath)
-        {
-            currentStep = currentStep == 0 ? destinationIndices.size() - 1 : currentStep - 1;
-        }
-        if (destinationIndices.empty())
-        {
-            LOG_WARN("No destination indices set for mover ID: ", mover.getId());
-            return;
-        }
-        uint32_t goalIndex = destinationIndices[currentStep];
-        goalIndex = calculateValidGoalindex(goalIndex);
-
-        currentStep = (currentStep + 1) % destinationIndices.size();
-
-        const auto path = grid::aStarFindPath(startIndex, goalIndex, grid);
-
-        mover.setPath(path);
-        LOG_INFO("Mover ID: ", mover.getId(), " new path set from startIndex ", startIndex, " to goalIndex ", goalIndex);
     }
 
     void update()
@@ -99,6 +67,80 @@ public:
     }
 
 private:
+    void setDestination(MovableComponent &mover, bool shouldRecalculatePath = false)
+    {
+        const std::optional<uint32_t> startIndexOpt = getStartIndex(mover);
+        if (!startIndexOpt)
+        {
+            return;
+        }
+        auto &context = pathContexts[&mover];
+
+        if (not hasDestinations(mover, context))
+        {
+            return;
+        }
+
+        adjustCurrentStep(context, shouldRecalculatePath);
+
+        const uint32_t startIndex = *startIndexOpt;
+        const uint32_t goalIndex = getNextGoalIndex(context);
+
+        const auto path = grid::aStarFindPath(startIndex, goalIndex, grid);
+        mover.setPath(path);
+
+        LOG_INFO(
+            "Mover ID: ", mover.getId(),
+            " new path set from startIndex ", startIndex,
+            " to goalIndex ", goalIndex);
+    }
+
+    std::optional<uint32_t> getStartIndex(const MovableComponent &mover)
+    {
+        const auto position = mover.getPosition();
+        const auto indexOpt = grid.getRhombiIndexByPosition(position);
+
+        if (!indexOpt)
+        {
+            LOG_WARN(
+                "Mover ID: ", mover.getId(),
+                " is not on a valid rhombus. Cannot set destination.");
+        }
+
+        return indexOpt;
+    }
+
+    bool hasDestinations(const MovableComponent &mover, const PathContext &context)
+    {
+        if (!context.destinationIndices.empty())
+            return true;
+
+        LOG_WARN("No destination indices set for mover ID: ", mover.getId());
+        return false;
+    }
+
+    void adjustCurrentStep(PathContext &context, bool shouldRecalculatePath)
+    {
+        if (!shouldRecalculatePath)
+            return;
+
+        const auto size = context.destinationIndices.size();
+        context.currentStep = (context.currentStep == 0)
+                                  ? size - 1
+                                  : context.currentStep - 1;
+    }
+
+    uint32_t getNextGoalIndex(PathContext &context)
+    {
+        const auto &destinations = context.destinationIndices;
+
+        uint32_t goalIndex = destinations[context.currentStep];
+        goalIndex = calculateValidGoalindex(goalIndex);
+
+        context.currentStep = (context.currentStep + 1) % destinations.size();
+        return goalIndex;
+    }
+
     uint32_t calculateValidGoalindex(uint32_t goalIndex)
     {
         const auto &occupiedRhomus = grid.getModel().occupiedRhomus;

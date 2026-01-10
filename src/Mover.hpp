@@ -45,10 +45,10 @@ public:
         if (not hasActivePath() || centers.size() == 0)
         {
             LOG_WARN("!!! Mover::updateMover Invalid path for mover ID: ", id, " currentSegment ", currentSegment, " hasActivePath() ",
-                hasActivePath(), " centers.size() ", centers.size(), " !!!");
+                     hasActivePath(), " centers.size() ", centers.size(), " !!!");
             return MovementStep::INVALID_PATH;
         }
-        if(currentSegment >= path.size() - 1)
+        if (currentSegment >= path.size() - 1)
         {
             return MovementStep::END_REACHED;
         }
@@ -95,7 +95,7 @@ public:
         if (currentSegment >= path.size())
         {
             return {};
-        }   
+        }
         return std::vector<uint32_t>(path.begin() + currentSegment, path.end());
     }
 

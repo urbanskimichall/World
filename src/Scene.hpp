@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "grid/Grid.hpp"
-#include "Mover.hpp"
+#include "MovableComponent.hpp"
 #include "components/ComponentManager.hpp"
 #include <array>
 #include "grid/GridSpacing.hpp"
@@ -11,11 +11,12 @@
 #include "Tooltip.hpp"
 #include "Farmer.hpp"
 #include "MovementSystem.hpp"
+#include "LoopableMovement.hpp"
 
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), movementSystem(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid) {}
 
     void init()
     {
@@ -105,7 +106,7 @@ public:
         LOG_INFO("Scene initialized.");
         //movementSystem.addMover(farmer01, {900, 3000});
         //movementSystem.addMover(farmer02, {345, 4000});
-        movementSystem.addMover(farmer03, {512, 4427, 122232, 345, 678, 2345});
+        movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid));
         LOG_INFO("Movers added to MovementSystem.");
     }
 

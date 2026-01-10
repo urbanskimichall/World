@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Mover.hpp"
+#include "MovableComponent.hpp"
 #include "components/Component.hpp"
 #include "components/BoxInfo.hpp"
 
@@ -9,7 +9,7 @@ class Farmer : public MovableComponent
 {
 public:
     Farmer(grid::Grid &grid, uint16_t id, const sf::Vector2f &initPosition, uint16_t homeId)
-    : MovableComponent(grid, id), homeId(homeId)
+        : MovableComponent(grid, id), homeId(homeId)
     {
         mover.setFillColor(sf::Color::Blue);
         mover.setPosition(initPosition + sf::Vector2f{10.f, 10.f});
@@ -50,6 +50,7 @@ public:
         info.soldiers = 0;
         return info;
     }
-    private:
+
+private:
     uint16_t homeId;
 };

@@ -15,18 +15,18 @@ struct PathContext
 class MovementSystem
 {
 public:
-    MovementSystem(grid::Grid &grid) : grid(grid) {}
+    MovementSystem(const grid::Grid &grid) : grid(grid) {}
 
     void addMover(MovableComponent& mover, const std::vector<uint32_t>& destinationIndices)
     {
         LOG_INFO("Adding mover ID: ", mover.getId(), " to MovementSystem.");
         movers.push_back(&mover);
-        pathContexts[&mover] = PathContext{0, destinationIndices}; // example destination indices
+        pathContexts[&mover] = PathContext{0, destinationIndices};
         
-        setDestination(mover); // hardcoded for testing
+        setDestination(mover);
     }
 
-    void setDestination(MovableComponent& mover)
+    void setDestination(MovableComponent& mover, bool shouldRecalculatePath = false)
     {
         auto startPosition = mover.getPosition();
         auto startOpt = grid.getRhombiIndexByPosition(startPosition);
@@ -38,20 +38,52 @@ public:
         const uint32_t startIndex = *startOpt;
         const auto& destinationIndices = pathContexts[&mover].destinationIndices;
         uint32_t& currentStep = pathContexts[&mover].currentStep;
+        if(shouldRecalculatePath)
+        {
+            currentStep = currentStep == 0 ? destinationIndices.size() - 1 : currentStep - 1;
+        }
         if(destinationIndices.empty())
         {
             LOG_WARN("No destination indices set for mover ID: ", mover.getId());
             return;
         }
         uint32_t goalIndex = destinationIndices[currentStep];
-        goalIndex = checkIfGoalIndexIsNotOccupiedAndIfGolaIndexIsNotValidFindTheClosestFirstValid(goalIndex);
+        goalIndex = calculateValidGoalindex(goalIndex);
+
         currentStep = (currentStep + 1) % destinationIndices.size();
+
         const auto path = grid::aStarFindPath(startIndex, goalIndex, grid);
 
         mover.setPath(path);
+        LOG_INFO("Mover ID: ", mover.getId(), " new path set from startIndex ", startIndex, " to goalIndex ", goalIndex);
     }
 
-    uint32_t checkIfGoalIndexIsNotOccupiedAndIfGolaIndexIsNotValidFindTheClosestFirstValid(uint32_t goalIndex)
+    void update()
+    {
+        for (auto* mover : movers)
+        {
+            if(mover == nullptr)
+            {
+                LOG_WARN("Encountered null mover pointer, skipping.");
+                continue;
+            }
+            auto step = mover->updateMover(grid.getRhomusCentersPoints());
+
+            if(step == MovementStep::CHECKPOINT_REACHED)
+            {
+                checkIfRemainignPathValid(*mover);
+            }
+
+            if (step == MovementStep::END_REACHED)
+            {
+                LOG_INFO("Mover ID ", mover->getId(), " reached its destination.");
+                setDestination(*mover);
+            }
+        }
+    }
+
+private:
+    uint32_t calculateValidGoalindex(uint32_t goalIndex)
     {
         const auto &occupiedRhomus = grid.getModel().occupiedRhomus;
         const auto &neighborIndices = grid.getModel().neighborIndices;
@@ -92,27 +124,23 @@ public:
         return goalIndex;
     }
 
-    void update()
+    void checkIfRemainignPathValid(MovableComponent& mover)
     {
-        for (auto* mover : movers)
-        {
-            if(mover == nullptr)
-            {
-                LOG_WARN("Encountered null mover pointer, skipping.");
-                continue;
-            }
-            auto step = mover->updateMover(grid.getRhomusCentersPoints());
+        const auto& remainingPath = mover.getRemainingPath();
+        const auto& occupiedRhomus = grid.getModel().occupiedRhomus;
 
-            if (step == MovementStep::END_REACHED)
+        for (size_t i = 1; i < remainingPath.size(); ++i)
+        {
+            if (std::find(occupiedRhomus.begin(), occupiedRhomus.end(), remainingPath[i]) != occupiedRhomus.end())
             {
-                LOG_INFO("Mover ID ", mover->getId(), " reached its destination.");
-                setDestination(*mover);
+                LOG_INFO("Remaining path for mover ID ", mover.getId(), " is blocked. Recalculating path.");
+                setDestination(mover, true);
+                break;
             }
         }
     }
 
-private:
-    grid::Grid &grid;
+    const grid::Grid &grid;
     std::vector<MovableComponent *> movers;
     std::unordered_map<MovableComponent *, PathContext> pathContexts;
 };

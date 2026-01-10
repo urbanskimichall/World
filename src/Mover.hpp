@@ -8,7 +8,8 @@
 enum class MovementStep : uint8_t
 {
     ONGOING = 0,
-    END_REACHED = 1,
+    CHECKPOINT_REACHED = 1,
+    END_REACHED = 2,
     INVALID_PATH = 0xFF
 };
 
@@ -43,7 +44,8 @@ public:
         float dt = clock.restart().asSeconds();
         if (not hasActivePath() || centers.size() == 0)
         {
-            LOG_WARN("!!! Invalid path for mover ID: ", id);
+            LOG_WARN("!!! Mover::updateMover Invalid path for mover ID: ", id, " currentSegment ", currentSegment, " hasActivePath() ",
+                hasActivePath(), " centers.size() ", centers.size(), " !!!");
             return MovementStep::INVALID_PATH;
         }
         if(currentSegment >= path.size() - 1)
@@ -76,6 +78,7 @@ public:
 
             // Snap to end point for visual accuracy
             mover.setPosition({p1.x, p1.y});
+            return MovementStep::CHECKPOINT_REACHED;
         }
         else
         {
@@ -86,6 +89,16 @@ public:
         }
         return MovementStep::ONGOING;
     }
+
+    std::vector<uint32_t> getRemainingPath() const
+    {
+        if (currentSegment >= path.size())
+        {
+            return {};
+        }   
+        return std::vector<uint32_t>(path.begin() + currentSegment, path.end());
+    }
+
     void draw(sf::RenderTarget &target) const override
     {
         target.draw(mover);

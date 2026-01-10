@@ -103,9 +103,9 @@ public:
         auto &farmer03 = componentManager.emplaceComponent<Farmer>(farmer3);
         
         LOG_INFO("Scene initialized.");
-        movementSystem.addMover(farmer01, {40, 188, 900, 20});
-        movementSystem.addMover(farmer02, {120, 188, 345, 520});
-        movementSystem.addMover(farmer03, {10, 256, 512, 1245});
+        //movementSystem.addMover(farmer01, {900, 3000});
+        //movementSystem.addMover(farmer02, {345, 4000});
+        movementSystem.addMover(farmer03, {512, 4427});
         LOG_INFO("Movers added to MovementSystem.");
     }
 

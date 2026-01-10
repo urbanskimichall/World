@@ -17,16 +17,32 @@ class MovementSystem
 public:
     MovementSystem(const grid::Grid &grid) : grid(grid) {}
 
-    void addMover(MovableComponent& mover, const std::vector<uint32_t>& destinationIndices)
+    void addMover(MovableComponent &mover, const std::vector<uint32_t> &destinationIndices)
     {
         LOG_INFO("Adding mover ID: ", mover.getId(), " to MovementSystem.");
         movers.push_back(&mover);
-        pathContexts[&mover] = PathContext{0, destinationIndices};
+
+        const std::vector<uint32_t> validDestinations = [&]()
+        {
+            std::vector<uint32_t> validIndices;
+            for (const auto index : destinationIndices)
+            {
+                if (index >= grid.getRhomusCenters().size())
+                {
+                    LOG_WARN("Destination index ", index, " is out of bounds. Skipping.");
+                    continue;
+                }
+                validIndices.push_back(index);
+            }
+            return validIndices;
+        }();
         
+        pathContexts[&mover] = PathContext{0, validDestinations};
+
         setDestination(mover);
     }
 
-    void setDestination(MovableComponent& mover, bool shouldRecalculatePath = false)
+    void setDestination(MovableComponent &mover, bool shouldRecalculatePath = false)
     {
         auto startPosition = mover.getPosition();
         auto startOpt = grid.getRhombiIndexByPosition(startPosition);
@@ -36,13 +52,13 @@ public:
             return;
         }
         const uint32_t startIndex = *startOpt;
-        const auto& destinationIndices = pathContexts[&mover].destinationIndices;
-        uint32_t& currentStep = pathContexts[&mover].currentStep;
-        if(shouldRecalculatePath)
+        const auto &destinationIndices = pathContexts[&mover].destinationIndices;
+        uint32_t &currentStep = pathContexts[&mover].currentStep;
+        if (shouldRecalculatePath)
         {
             currentStep = currentStep == 0 ? destinationIndices.size() - 1 : currentStep - 1;
         }
-        if(destinationIndices.empty())
+        if (destinationIndices.empty())
         {
             LOG_WARN("No destination indices set for mover ID: ", mover.getId());
             return;
@@ -60,16 +76,16 @@ public:
 
     void update()
     {
-        for (auto* mover : movers)
+        for (auto *mover : movers)
         {
-            if(mover == nullptr)
+            if (mover == nullptr)
             {
                 LOG_WARN("Encountered null mover pointer, skipping.");
                 continue;
             }
             auto step = mover->updateMover(grid.getRhomusCentersPoints());
 
-            if(step == MovementStep::CHECKPOINT_REACHED)
+            if (step == MovementStep::CHECKPOINT_REACHED)
             {
                 checkIfRemainignPathValid(*mover);
             }
@@ -124,10 +140,10 @@ private:
         return goalIndex;
     }
 
-    void checkIfRemainignPathValid(MovableComponent& mover)
+    void checkIfRemainignPathValid(MovableComponent &mover)
     {
-        const auto& remainingPath = mover.getRemainingPath();
-        const auto& occupiedRhomus = grid.getModel().occupiedRhomus;
+        const auto &remainingPath = mover.getRemainingPath();
+        const auto &occupiedRhomus = grid.getModel().occupiedRhomus;
 
         for (size_t i = 1; i < remainingPath.size(); ++i)
         {

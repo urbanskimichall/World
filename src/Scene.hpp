@@ -105,7 +105,7 @@ public:
         LOG_INFO("Scene initialized.");
         //movementSystem.addMover(farmer01, {900, 3000});
         //movementSystem.addMover(farmer02, {345, 4000});
-        movementSystem.addMover(farmer03, {512, 4427});
+        movementSystem.addMover(farmer03, {512, 4427, 122232, 345, 678, 2345});
         LOG_INFO("Movers added to MovementSystem.");
     }
 

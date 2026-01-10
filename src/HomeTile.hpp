@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "TextureManager.hpp"
+#include "resource/TextureManager.hpp"
 #include "components/Component.hpp"
 #include "components/BoxInfo.hpp"
 

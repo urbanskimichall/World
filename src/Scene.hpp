@@ -138,7 +138,7 @@ public:
     {
         componentManager.draw(target);
 
-        sf::FloatRect bounds = getViewBounds(target);
+        //sf::FloatRect bounds = getViewBounds(target);
         // grid.draw(target, bounds);
         tooltip.draw(target);
     }

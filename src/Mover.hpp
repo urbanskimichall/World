@@ -4,6 +4,8 @@
 #include <cstdint>
 #include "utils/Point.hpp"
 #include "components/Component.hpp"
+#include "Logger.hpp"
+#include "ProgressBar.hpp"
 
 enum class MovementStep : uint8_t
 {
@@ -47,6 +49,9 @@ public:
         if (movementState == MovementStep::WAITING)
         {
             waitElapsed += dt;
+
+            progressBar.setProgress(waitElapsed / 1.f);
+            progressBar.setPosition(mover.getPosition() + sf::Vector2f(-20.f, -15.f));
 
             if (waitElapsed >= 1)
             {
@@ -119,6 +124,10 @@ public:
 
     void draw(sf::RenderTarget &target) const override
     {
+        if(movementState == MovementStep::WAITING)
+        {
+            progressBar.draw(target);
+        }
         target.draw(mover);
     }
     void setPosition(const sf::Vector2f &pos) override
@@ -167,4 +176,5 @@ protected:
     sf::CircleShape mover{4.f};
     MovementStep movementState = MovementStep::INVALID_PATH;
     float waitElapsed = 0.f;
+    ProgressBar progressBar{40.f, 6.f};
 };

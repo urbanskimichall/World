@@ -15,10 +15,6 @@ public:
         mover.setPosition(initPosition + sf::Vector2f{10.f, 10.f});
     }
 
-    void draw(sf::RenderTarget &target) const override
-    {
-        target.draw(mover);
-    }
     void setPosition(const sf::Vector2f &pos) override
     {
         mover.setPosition(pos);

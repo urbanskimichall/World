@@ -3,16 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include "components/BoxInfo.hpp"
+#include "resource/FontManager.hpp"
 
 class Tooltip
 {
 public:
     Tooltip() : text(font)
     {
-        if (!font.openFromFile("assets/fonts/OpenSans-Italic.ttf"))
-        {
-            throw std::runtime_error("Failed to load font");
-        }
+        font = FontManager::instance().get("assets/fonts/OpenSans-Italic.ttf");
         background.setFillColor(sf::Color(30, 30, 30, 220));
         background.setOutlineColor(sf::Color::White);
         background.setOutlineThickness(1.f);

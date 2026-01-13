@@ -12,6 +12,7 @@
 #include "Farmer.hpp"
 #include "MovementSystem.hpp"
 #include "LoopableMovement.hpp"
+#include "TargetOrientedMovement.hpp"
 
 class Scene
 {
@@ -96,17 +97,22 @@ public:
         // componentManager.emplaceComponent<HomeTile>(homeTile14);
         // HomeTile homeTile15(grid, 14, {750, 375}, homeLevel5);
         // componentManager.emplaceComponent<HomeTile>(homeTile15);
-        Farmer farmer1(grid, 15, homeTile10.getPosition() + sf::Vector2f{homeTile10.getSize().x / 2, homeTile10.getSize().y - 15}, homeTile10.getId());
+        Farmer farmer1(grid, 15, homeTile10.getPosition() + sf::Vector2f{homeTile10.getSize().x / 2, homeTile10.getSize().y + 65}, homeTile10.getId());
         auto &farmer01 = componentManager.emplaceComponent<Farmer>(farmer1);
         Farmer farmer2(grid, 16, homeTile11.getPosition() + sf::Vector2f{homeTile11.getSize().x / 2, homeTile11.getSize().y - 15}, homeTile11.getId());
         auto &farmer02 = componentManager.emplaceComponent<Farmer>(farmer2);
         Farmer farmer3(grid, 17, homeTile5.getPosition() + sf::Vector2f{homeTile5.getSize().x / 2, homeTile5.getSize().y - 15}, homeTile5.getId());
         auto &farmer03 = componentManager.emplaceComponent<Farmer>(farmer3);
-        
+        Farmer farmer4(grid, 18, homeTile9.getPosition() + sf::Vector2f{homeTile9.getSize().x / 2, homeTile9.getSize().y + 65}, homeTile9.getId());
+        auto &farmer04 = componentManager.emplaceComponent<Farmer>(farmer4);
+
         LOG_INFO("Scene initialized.");
-        //movementSystem.addMover(farmer01, {900, 3000});
-        //movementSystem.addMover(farmer02, {345, 4000});
+        // movementSystem.addMover(farmer01, {900, 3000});
+        // movementSystem.addMover(farmer02, {345, 4000});
         movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid));
+        movementSystem.addMover(farmer02, std::make_unique<TargetOrientedMovement>(grid));
+        movementSystem.addMover(farmer01, std::make_unique<TargetOrientedMovement>(grid));
+        movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
         LOG_INFO("Movers added to MovementSystem.");
     }
 
@@ -139,7 +145,7 @@ public:
     {
         componentManager.draw(target);
 
-        //sf::FloatRect bounds = getViewBounds(target);
+        // sf::FloatRect bounds = getViewBounds(target);
         // grid.draw(target, bounds);
         tooltip.draw(target);
     }

@@ -7,12 +7,6 @@
 #include "grid/Pathfinder.hpp"
 #include "MovementStrategy.hpp"
 
-struct PathContext
-{
-    uint32_t currentStep;
-    std::vector<uint32_t> destinationIndices;
-};
-
 class LoopableMovement : public MovementStrategy
 {
 public:
@@ -23,6 +17,12 @@ public:
     void update(MovableComponent &mover) override;
 
 private:
+    struct PathContext
+    {
+        uint32_t currentStep;
+        std::vector<uint32_t> destinationIndices;
+    };
+
     void setDestination(MovableComponent &mover, bool shouldRecalculatePath = false);
 
     std::optional<uint32_t> getStartIndex(const MovableComponent &mover);
@@ -38,6 +38,6 @@ private:
     void checkIfRemainignPathValid(MovableComponent &mover);
 
     const grid::Grid &grid;
-    //std::vector<MovableComponent *> movers;
+    // std::vector<MovableComponent *> movers;
     std::unordered_map<MovableComponent *, PathContext> pathContexts;
 };

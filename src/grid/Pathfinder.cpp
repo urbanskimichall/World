@@ -54,7 +54,9 @@ namespace grid
             for (uint32_t neighbor : neighborIndices[current])
             {
                 if (blocked.count(neighbor))
+                {
                     continue;
+                }
 
                 float tentative = gScore[current] + dist(current, neighbor);
                 if (tentative < gScore[neighbor])

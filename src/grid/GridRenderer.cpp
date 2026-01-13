@@ -45,6 +45,8 @@ namespace grid
             {
                 shape.setFillColor(sf::Color(255, 0, 0, 50));
                 shape.setOutlineColor(sf::Color::Red);
+                shape.setOutlineThickness(1.5f);
+                window.draw(shape);
             }
             else if (std::find(selectedIndices.begin(), selectedIndices.end(), i) != selectedIndices.end())
             {
@@ -63,9 +65,6 @@ namespace grid
                 shape.setOutlineColor(sf::Color::Yellow);
             }
 
-            shape.setOutlineThickness(1.5f);
-            window.draw(shape);
-
             if (std::find(model.occupiedRhomus.begin(), model.occupiedRhomus.end(), i) != model.occupiedRhomus.end())
             {
                 sf::CircleShape dot(3.f);
@@ -78,15 +77,7 @@ namespace grid
                 sf::CircleShape dot(3.f);
                 dot.setFillColor(sf::Color::Yellow);
                 dot.setPosition({model.rhombusCenters[i].x - 3.f, model.rhombusCenters[i].y - 3.f});
-                window.draw(dot);
-            }
-
-            if (std::find(model.path.begin(), model.path.end(), i) != model.path.end())
-            {
-                sf::CircleShape dot(4.f);
-                dot.setFillColor(sf::Color::Blue);
-                dot.setPosition({model.rhombusCenters[i].x - 4.f, model.rhombusCenters[i].y - 4.f});
-                window.draw(dot);
+                //window.draw(dot);
             }
         }
     }

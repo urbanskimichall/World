@@ -86,7 +86,7 @@ public:
         {
             currentSegment++;
             segmentProgress = 0.f;
-            return MovementStep::ONGOING;
+            return MovementStep::CHECKPOINT_REACHED;
         }
 
         // Increase progress based on time and speed

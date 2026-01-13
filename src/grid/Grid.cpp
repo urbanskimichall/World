@@ -17,8 +17,7 @@ namespace grid
 
     void Grid::draw(sf::RenderWindow &window, const sf::FloatRect &viewBounds) const
     {
-        renderer.draw(model, window, viewBounds);
-       
+        //renderer.draw(model, window, viewBounds);    
         renderer.drawRhombi(model, window, viewBounds, highlightedIndex, selectedRhombi);
     }
 

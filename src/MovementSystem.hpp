@@ -16,6 +16,7 @@ public:
         strategies[&mover] = std::move(strategy);
         strategies[&mover]->addMover(mover, {512, 4427, 122232, 345, 678, 2345});
         movers.push_back(&mover);
+        LOG_INFO("Mover ID: ", mover.getId(), " added to MovementSystem ", movers.size()," total movers.");
     }
 
     void update()

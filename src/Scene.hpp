@@ -43,7 +43,7 @@ public:
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
 
-        updateOccupiedCells();
+
         // mover.init();
 
         const float tileWidth = 100.f;
@@ -114,6 +114,8 @@ public:
         movementSystem.addMover(farmer01, std::make_unique<TargetOrientedMovement>(grid));
         movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
         LOG_INFO("Movers added to MovementSystem.");
+
+        updateOccupiedCells();
     }
 
     void selectRhombusAtMouse(const sf::Vector2f &mouseWorld)

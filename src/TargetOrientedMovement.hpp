@@ -32,7 +32,11 @@ public:
             return;
         }
         const uint32_t highlightedIndex = highlightedIndexOpt.value();
-        uint32_t& currentHighlightedIndex = moverToHighlightedIndex[&mover];
+        uint32_t &currentHighlightedIndex = moverToHighlightedIndex[&mover];
+        if (step == MovementStep::CHECKPOINT_REACHED and not checkIfRemainignPathValid(mover))
+        {
+            return;
+        }
         if (currentHighlightedIndex != highlightedIndex)
         {
             if (step == MovementStep::INVALID_PATH or step == MovementStep::END_REACHED or step == MovementStep::CHECKPOINT_REACHED)
@@ -90,6 +94,23 @@ private:
         }
 
         return indexOpt;
+    }
+
+    bool checkIfRemainignPathValid(MovableComponent &mover)
+    {
+        const auto &remainingPath = mover.getRemainingPath();
+        const auto &occupiedRhomus = grid.getModel().occupiedRhomus;
+
+        for (size_t i = 1; i < remainingPath.size(); ++i)
+        {
+            if (std::find(occupiedRhomus.begin(), occupiedRhomus.end(), remainingPath[i]) != occupiedRhomus.end())
+            {
+                LOG_INFO("Target oriented Remaining path for mover ID ", mover.getId(), " is blocked. Recalculating path.");
+                setDestination(mover);
+                return false;
+            }
+        }
+        return true;
     }
 
     const grid::Grid &grid;

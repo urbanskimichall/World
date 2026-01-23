@@ -13,11 +13,12 @@
 #include "MovementSystem.hpp"
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
+#include "ShootingSystem.hpp"
 
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), shootingSystem(grid) {}
 
     void init()
     {
@@ -42,7 +43,6 @@ public:
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
         // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
-
 
         // mover.init();
 
@@ -113,6 +113,8 @@ public:
         movementSystem.addMover(farmer02, std::make_unique<TargetOrientedMovement>(grid));
         movementSystem.addMover(farmer01, std::make_unique<TargetOrientedMovement>(grid));
         movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
+
+        shootingSystem.addShooter(farmer01);
         LOG_INFO("Movers added to MovementSystem.");
 
         updateOccupiedCells();
@@ -132,6 +134,7 @@ public:
         grid.highlightRhombusUnderMouse(mouseWorld);
 
         movementSystem.update();
+        shootingSystem.update();
 
         if (const auto *c = componentManager.getHoveredComponent(mouseWorld))
         {
@@ -149,12 +152,14 @@ public:
 
         // sf::FloatRect bounds = getViewBounds(target);
         // grid.draw(target, bounds);
+        shootingSystem.draw(target);
         tooltip.draw(target);
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
     {
         componentManager.handleEvent(event, window);
+        shootingSystem.handleEvent(event, window);
     }
 
 private:
@@ -189,4 +194,5 @@ private:
     components::ComponentManager componentManager;
     Tooltip tooltip;
     MovementSystem movementSystem;
+    ShootingSystem shootingSystem;
 };

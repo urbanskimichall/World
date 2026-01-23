@@ -64,8 +64,8 @@ public:
 
         if (not hasActivePath() || centers.size() == 0)
         {
-            LOG_WARN("!!! Mover::updateMover Invalid path for mover ID: ", id, " currentSegment ", currentSegment, " hasActivePath() ",
-                     hasActivePath(), " centers.size() ", centers.size(), " !!!");
+            //LOG_WARN("!!! Mover::updateMover Invalid path for mover ID: ", id, " currentSegment ", currentSegment, " hasActivePath() ",
+            //         hasActivePath(), " centers.size() ", centers.size(), " !!!");
             movementState = MovementStep::INVALID_PATH;
             return movementState;
         }

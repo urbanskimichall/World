@@ -23,7 +23,7 @@ public:
         const std::optional<uint32_t> highlightedIndexOpt = grid.getHighlightedIndexIfNotOccupied();
         if (!highlightedIndexOpt)
         {
-            LOG_WARN("Target oriented: No valid highlighted rhombus under mouse for mover ID: ", mover.getId());
+            // LOG_WARN("Target oriented: No valid highlighted rhombus under mouse for mover ID: ", mover.getId());
             return;
         }
         if (highlightedIndexOpt.value() == UINT32_MAX)
@@ -41,8 +41,8 @@ public:
         {
             if (step == MovementStep::INVALID_PATH or step == MovementStep::END_REACHED or step == MovementStep::CHECKPOINT_REACHED)
             {
-                LOG_INFO("Target oriented: Recalculating path for mover ID: ", mover.getId(),
-                         " due to invalid path and new highlighted rhombus ", highlightedIndex);
+                // LOG_INFO("Target oriented: Recalculating path for mover ID: ", mover.getId(),
+                //          " due to invalid path and new highlighted rhombus ", highlightedIndex);
                 setDestination(mover);
                 currentHighlightedIndex = highlightedIndex;
             }
@@ -55,7 +55,7 @@ private:
         const uint32_t currentHighlightedIndex = moverToHighlightedIndex[&mover];
         if (currentHighlightedIndex == UINT32_MAX)
         {
-            LOG_WARN("Target oriented: No rhombus highlighted under mouse for mover ID: ", mover.getId());
+            // LOG_WARN("Target oriented: No rhombus highlighted under mouse for mover ID: ", mover.getId());
             return;
         }
         const std::optional<uint32_t> startIndexOpt = getStartIndex(mover);
@@ -70,15 +70,15 @@ private:
         const auto path = grid::aStarFindPath(startIndex, goalIndex, grid);
         if (path.empty())
         {
-            LOG_WARN("No path found for target oriented mover ID: ", mover.getId(), " from rhombus ", startIndex, " to ", goalIndex);
+            // LOG_WARN("No path found for target oriented mover ID: ", mover.getId(), " from rhombus ", startIndex, " to ", goalIndex);
             return;
         }
         mover.setPath(path);
 
-        LOG_INFO(
-            "Mover ID: ", mover.getId(),
-            " new path set from startIndex ", startIndex,
-            " to goalIndex ", goalIndex);
+        // LOG_INFO(
+        //     "Mover ID: ", mover.getId(),
+        //     " new path set from startIndex ", startIndex,
+        //     " to goalIndex ", goalIndex);
     }
 
     std::optional<uint32_t> getStartIndex(const MovableComponent &mover)
@@ -105,7 +105,7 @@ private:
         {
             if (std::find(occupiedRhomus.begin(), occupiedRhomus.end(), remainingPath[i]) != occupiedRhomus.end())
             {
-                LOG_INFO("Target oriented Remaining path for mover ID ", mover.getId(), " is blocked. Recalculating path.");
+                // LOG_INFO("Target oriented Remaining path for mover ID ", mover.getId(), " is blocked. Recalculating path.");
                 setDestination(mover);
                 return false;
             }

@@ -36,6 +36,11 @@ public:
         isActive = active;
     }
 
+    void setPosition(const sf::Vector2f &position)
+    {
+        bulletPicture.setPosition(position);
+    }
+
 private:
     sf::CircleShape bulletPicture{4.f};
     std::vector<sf::Vector2f> parabolicPath;

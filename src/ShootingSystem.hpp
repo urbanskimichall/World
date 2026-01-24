@@ -18,25 +18,46 @@ public:
     {
         for (auto &context : shootContexts)
         {
-            context.bullet.update();
-            if (context.parabolicPath.empty() or context.currentStep >= context.parabolicPath.size())
-            {
+            float dt = context.flightClock.restart().asSeconds();
+            if (context.parabolicPath.size() < 2)
                 continue;
-            }
-            float dt = context.flightClock.restart().asMilliseconds();
-            context.elapsedTime += dt;
-            if(context.elapsedTime >= 50.f) // advance every 50 ms
+
+            context.elapsedTime += dt * 1000.f; // ms
+
+            float normalizedTime =
+                context.elapsedTime / static_cast<float>(context.flightDurationMs);
+
+            if (normalizedTime >= 1.f)
             {
-                context.currentStep += 1;
-                context.elapsedTime = 0.f;
-            }
-            if(context.currentStep >= context.parabolicPath.size())
-            {
-                LOG_INFO("ShootingSystem: Shooter ID: ", context.shooter->getId(), " bullet has reached the end of its path.");
+                // Snap to final point
+                context.bullet.setPosition(context.parabolicPath.back());
                 context.bullet.setActive(false);
+
                 context.parabolicPath.clear();
                 context.currentStep = 0;
+                context.elapsedTime = 0.f;
+
+                LOG_INFO("Bullet reached target.");
+                continue;
             }
+
+            // Map time → path
+            float pathPos =
+                normalizedTime * (context.parabolicPath.size() - 1);
+
+            std::size_t index =
+                static_cast<std::size_t>(pathPos);
+
+            float localT = pathPos - index;
+
+            const sf::Vector2f &p0 = context.parabolicPath[index];
+            const sf::Vector2f &p1 = context.parabolicPath[index + 1];
+
+            // Linear interpolation
+            sf::Vector2f position =
+                p0 + (p1 - p0) * localT;
+
+            context.bullet.setPosition(position);
         }
     }
 
@@ -45,15 +66,6 @@ public:
         for (const auto &context : shootContexts)
         {
             context.bullet.draw(target);
-            if (context.parabolicPath.empty() or context.currentStep >= context.parabolicPath.size())
-            {
-                continue;
-            }
-            const auto &point = context.parabolicPath[context.currentStep];
-            sf::CircleShape pathPoint(5.f);
-            pathPoint.setFillColor(sf::Color::Red);
-            pathPoint.setPosition(point);
-            target.draw(pathPoint);
         }
     }
 
@@ -88,16 +100,17 @@ private:
         MovableComponent *shooter;
         Bullet bullet;
         uint32_t targetIndex = 2000;
-        uint32_t flightDurationMs = 10000;
+        uint32_t flightDurationMs = 2000;
         mutable sf::Clock flightClock;
         uint32_t currentStep = 0;
         float elapsedTime = 0.f;
         std::vector<sf::Vector2f> parabolicPath;
+        uint32_t totalPathLength = 0;
     };
 
     void generateParabolicPathFromStartIndexToTargetIndexOnTheGrid(ShootContext &context, uint32_t startIndex, uint32_t targetIndex)
     {
-        if(context.parabolicPath.empty() == false)
+        if (context.parabolicPath.empty() == false)
         {
             LOG_INFO("ShootingSystem: Shooter ID: ", context.shooter->getId(), " already has an active parabolic path. Skipping generation.");
             return;
@@ -133,6 +146,19 @@ private:
         context.parabolicPath = path;
         context.currentStep = 0;
         context.elapsedTime = 0.f;
+        calculateTotalLengthOfParabolicPath(context);
+    }
+
+    void calculateTotalLengthOfParabolicPath(ShootContext &context)
+    {
+        float totalLength = 0.f;
+        for (size_t i = 1; i < context.parabolicPath.size(); ++i)
+        {
+            sf::Vector2f diff = context.parabolicPath[i] - context.parabolicPath[i - 1];
+            totalLength += std::sqrt(diff.x * diff.x + diff.y * diff.y);
+        }
+        LOG_INFO("Total length of parabolic path: ", totalLength);
+        context.flightDurationMs = static_cast<uint32_t>(totalLength * 4);
     }
 
     const grid::Grid &grid;

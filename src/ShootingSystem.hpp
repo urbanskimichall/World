@@ -11,154 +11,163 @@ public:
 
     void addShooter(MovableComponent &shooter)
     {
-        shootContexts.push_back(ShootContext{&shooter, Bullet(shooter.getPosition())});
+        shootContexts.push_back(ShootContext{&shooter});
         LOG_INFO("Shooter ID: ", shooter.getId(), " added to ShootingSystem.");
     }
     void update()
     {
-        for (auto &context : shootContexts)
+        for (auto &shooterCtx : shootContexts)
         {
-            float dt = context.flightClock.restart().asSeconds();
-            if (context.parabolicPath.size() < 2)
-                continue;
-
-            context.elapsedTime += dt * 1000.f; // ms
-
-            float normalizedTime =
-                context.elapsedTime / static_cast<float>(context.flightDurationMs);
-
-            if (normalizedTime >= 1.f)
+            for (auto it = shooterCtx.bullets.begin();
+                 it != shooterCtx.bullets.end();)
             {
-                // Snap to final point
-                context.bullet.setPosition(context.parabolicPath.back());
-                context.bullet.setActive(false);
+                BulletContext &bulletCtx = *it;
 
-                context.parabolicPath.clear();
-                context.currentStep = 0;
-                context.elapsedTime = 0.f;
+                float dt = bulletCtx.flightClock.restart().asSeconds();
+                bulletCtx.elapsedTimeMs += dt * 1000.f;
 
-                LOG_INFO("Bullet reached target.");
-                continue;
+                float t =
+                    bulletCtx.elapsedTimeMs /
+                    static_cast<float>(bulletCtx.flightDurationMs);
+
+                if (t >= 1.f)
+                {
+                    bulletCtx.bullet.setPosition(
+                        bulletCtx.parabolicPath.back());
+                    bulletCtx.bullet.setActive(false);
+
+                    it = shooterCtx.bullets.erase(it); // remove finished bullet
+                    continue;
+                }
+
+                float pathPos =
+                    t * (bulletCtx.parabolicPath.size() - 1);
+
+                std::size_t index = static_cast<std::size_t>(pathPos);
+                float localT = pathPos - index;
+
+                const sf::Vector2f &p0 =
+                    bulletCtx.parabolicPath[index];
+                const sf::Vector2f &p1 =
+                    bulletCtx.parabolicPath[index + 1];
+
+                bulletCtx.bullet.setPosition(
+                    p0 + (p1 - p0) * localT);
+
+                ++it;
             }
-
-            // Map time → path
-            float pathPos =
-                normalizedTime * (context.parabolicPath.size() - 1);
-
-            std::size_t index =
-                static_cast<std::size_t>(pathPos);
-
-            float localT = pathPos - index;
-
-            const sf::Vector2f &p0 = context.parabolicPath[index];
-            const sf::Vector2f &p1 = context.parabolicPath[index + 1];
-
-            // Linear interpolation
-            sf::Vector2f position =
-                p0 + (p1 - p0) * localT;
-
-            context.bullet.setPosition(position);
         }
     }
 
     void draw(sf::RenderTarget &target) const
     {
-        for (const auto &context : shootContexts)
+        for (const auto &shooterCtx : shootContexts)
         {
-            context.bullet.draw(target);
+            for (const auto &bulletCtx : shooterCtx.bullets)
+            {
+                bulletCtx.bullet.draw(target);
+            }
         }
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
     {
-        if (event.is<sf::Event::KeyPressed>())
-        {
-            const auto &m = *event.getIf<sf::Event::KeyPressed>();
-            if (m.code == sf::Keyboard::Key::S)
-            {
-                for (auto &context : shootContexts)
-                {
-                    LOG_INFO("ShootingSystem: Shooter ID: ", context.shooter->getId(), " is attempting to shoot.");
-                    auto shooterIndex = grid.getRhombiIndexByPosition(context.shooter->getPosition()); // Assuming ID corresponds to grid index
-                    if (!shooterIndex.has_value())
-                    {
-                        LOG_WARN("ShootingSystem: Shooter ID: ", context.shooter->getId(), " has invalid position for shooting.");
-                        continue;
-                    }
+        if (!event.is<sf::Event::KeyPressed>())
+            return;
 
-                    generateParabolicPathFromStartIndexToTargetIndexOnTheGrid(context, shooterIndex.value(), context.targetIndex);
-                    context.bullet.setActive(true);
-                    LOG_INFO("Shooter ID: ", context.shooter->getId(), " fired at target index: ", context.targetIndex);
-                }
+        const auto &key = *event.getIf<sf::Event::KeyPressed>();
+        if (key.code != sf::Keyboard::Key::S)
+            return;
+
+        for (auto &shooterCtx : shootContexts)
+        {
+            auto shooterIndex =
+                grid.getRhombiIndexByPosition(shooterCtx.shooter->getPosition());
+
+            if (!shooterIndex)
+            {
+                LOG_WARN("Shooter ID ", shooterCtx.shooter->getId(),
+                         " has invalid position.");
+                continue;
             }
+
+            BulletContext bulletCtx{Bullet(shooterCtx.shooter->getPosition())};
+            bulletCtx.bullet.setActive(true);
+
+            generateParabolicPath(
+                bulletCtx,
+                shooterIndex.value(),
+                shooterCtx.targetIndex);
+
+            shooterCtx.bullets.push_back(std::move(bulletCtx));
+
+            LOG_INFO("Shooter ID ", shooterCtx.shooter->getId(),
+                     " fired a bullet.");
         }
     }
 
 private:
-    struct ShootContext
+    struct BulletContext
     {
-        MovableComponent *shooter;
         Bullet bullet;
-        uint32_t targetIndex = 2000;
-        uint32_t flightDurationMs = 2000;
-        mutable sf::Clock flightClock;
-        uint32_t currentStep = 0;
-        float elapsedTime = 0.f;
         std::vector<sf::Vector2f> parabolicPath;
-        uint32_t totalPathLength = 0;
+
+        float elapsedTimeMs = 0.f;
+        uint32_t flightDurationMs = 0;
+
+        sf::Clock flightClock;
     };
 
-    void generateParabolicPathFromStartIndexToTargetIndexOnTheGrid(ShootContext &context, uint32_t startIndex, uint32_t targetIndex)
+    struct ShootContext
     {
-        if (context.parabolicPath.empty() == false)
-        {
-            LOG_INFO("ShootingSystem: Shooter ID: ", context.shooter->getId(), " already has an active parabolic path. Skipping generation.");
-            return;
-        }
-        if (startIndex >= grid.getRhomusCenters().size() ||
-            targetIndex >= grid.getRhomusCenters().size())
-        {
-            LOG_WARN("Invalid start or target index for parabolic path generation.");
-            return;
-        }
+        MovableComponent *shooter = nullptr;
+        uint32_t targetIndex = 2000;
 
+        std::vector<BulletContext> bullets;
+    };
+
+    void generateParabolicPath(
+        BulletContext &bulletCtx,
+        uint32_t startIndex,
+        uint32_t targetIndex)
+    {
         sf::Vector2f start = grid.getRhomusCenters()[startIndex];
         sf::Vector2f end = grid.getRhomusCenters()[targetIndex];
 
-        const float gravity = -900.f;
-        const float flightTime = 1.0f;
+        constexpr float gravity = -900.f;
+        constexpr float flightTime = 1.0f;
+        constexpr int steps = 100;
 
         sf::Vector2f velocity;
         velocity.x = (end.x - start.x) / flightTime;
-        velocity.y = (end.y - start.y + 0.5f * gravity * flightTime * flightTime) / flightTime;
+        velocity.y = (end.y - start.y +
+                      0.5f * gravity * flightTime * flightTime) /
+                     flightTime;
 
-        std::vector<sf::Vector2f> path;
-        constexpr int steps = 100;
+        bulletCtx.parabolicPath.clear();
 
         for (int i = 0; i <= steps; ++i)
         {
             float t = flightTime * i / steps;
-            float x = start.x + velocity.x * t;
-            float y = start.y + velocity.y * t - 0.5f * gravity * t * t;
-            path.emplace_back(x, y);
+            bulletCtx.parabolicPath.emplace_back(
+                start.x + velocity.x * t,
+                start.y + velocity.y * t - 0.5f * gravity * t * t);
         }
 
-        context.parabolicPath = path;
-        context.currentStep = 0;
-        context.elapsedTime = 0.f;
-        calculateTotalLengthOfParabolicPath(context);
+        bulletCtx.flightDurationMs = static_cast<uint32_t>(
+            calculatePathLength(bulletCtx.parabolicPath) * 4.f);
     }
 
-    void calculateTotalLengthOfParabolicPath(ShootContext &context)
+    float calculatePathLength(auto &parabolicPath)
     {
         float totalLength = 0.f;
-        for (size_t i = 1; i < context.parabolicPath.size(); ++i)
+        for (size_t i = 1; i < parabolicPath.size(); ++i)
         {
-            sf::Vector2f diff = context.parabolicPath[i] - context.parabolicPath[i - 1];
+            sf::Vector2f diff = parabolicPath[i] - parabolicPath[i - 1];
             totalLength += std::sqrt(diff.x * diff.x + diff.y * diff.y);
         }
         LOG_INFO("Total length of parabolic path: ", totalLength);
-        context.flightDurationMs = static_cast<uint32_t>(totalLength * 4);
+        return totalLength;
     }
 
     const grid::Grid &grid;

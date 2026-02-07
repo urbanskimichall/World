@@ -115,6 +115,8 @@ public:
         movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
 
         shootingSystem.addShooter(farmer01);
+        shootingSystem.addShooter(farmer02);
+        shootingSystem.addShooter(farmer03);
         LOG_INFO("Movers added to MovementSystem.");
 
         updateOccupiedCells();

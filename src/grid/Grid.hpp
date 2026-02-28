@@ -10,6 +10,19 @@
 
 namespace grid
 {
+
+    enum class NeighborDirection
+    {
+        Up,
+        UpLeft,
+        UpRight,
+        Down,
+        DownLeft,
+        DownRight,
+        Left,
+        Right
+    };
+
     class Grid
     {
     public:
@@ -86,6 +99,38 @@ namespace grid
                 }
             }
             return closestCenter;
+        }
+
+        // --------------------------------------------------------------------
+        // Utility: return all rhombus centers that lie within a square region
+        // defined by a central point and a side length.  The square is centered
+        // at `squareCenter` and extends `sideLength/2` in each direction.  The
+        // comparison is inclusive of the boundary.
+        //
+        // Parameters:
+        //   squareCenter   center of the square region
+        //   sideLength     length of one side of the square
+        //
+        // Returns:
+        //   vector of positions from the grid's rhombusCenters that fall inside.
+        std::vector<sf::Vector2f> getCentersInSquare(const sf::Vector2f &squareCenter,
+                                                     float sideLength) const
+        {
+            std::vector<sf::Vector2f> result;
+            float half = sideLength * 0.5f;
+            float minX = squareCenter.x - half;
+            float maxX = squareCenter.x + half;
+            float minY = squareCenter.y - half;
+            float maxY = squareCenter.y + half;
+
+            for (const auto &c : model.rhombusCenters)
+            {
+                if (c.x >= minX && c.x <= maxX && c.y >= minY && c.y <= maxY)
+                {
+                    result.push_back(c);
+                }
+            }
+            return result;
         }
 
     private:

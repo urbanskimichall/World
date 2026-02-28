@@ -14,6 +14,7 @@
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
 #include "ShootingSystem.hpp"
+#include "FormationFactory.hpp"
 
 class Scene
 {
@@ -106,6 +107,13 @@ public:
         Farmer farmer4(grid, 18, homeTile9.getPosition() + sf::Vector2f{homeTile9.getSize().x / 2, homeTile9.getSize().y + 65}, homeTile9.getId());
         auto &farmer04 = componentManager.emplaceComponent<Farmer>(farmer4);
 
+
+
+        auto farmers = formationFactory.createFormation<Farmer>(
+            grid,
+            3500,
+            componentManager);
+
         LOG_INFO("Scene initialized.");
         // movementSystem.addMover(farmer01, {900, 3000});
         // movementSystem.addMover(farmer02, {345, 4000});
@@ -156,6 +164,14 @@ public:
         // grid.draw(target, bounds);
         shootingSystem.draw(target);
         tooltip.draw(target);
+
+        const auto& formationFactoryPositions = formationFactory.getFormationPositions();
+        for (const auto& pos : formationFactoryPositions)        {
+            sf::CircleShape circle(5.f);
+            circle.setFillColor(sf::Color::Yellow);
+            circle.setPosition(pos - sf::Vector2f(5.f, 5.f));
+            target.draw(circle);
+        }
     }
 
     void handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -197,4 +213,5 @@ private:
     Tooltip tooltip;
     MovementSystem movementSystem;
     ShootingSystem shootingSystem;
+    FormationFactory formationFactory;
 };

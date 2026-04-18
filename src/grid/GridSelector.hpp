@@ -44,6 +44,7 @@ namespace grid
                     return i;
                 }
             }
+            return UINT32_MAX;
         }
 
         uint32_t unselectRhombusAtMouse(GridModel &model, const sf::Vector2f &mousePos,
@@ -62,6 +63,7 @@ namespace grid
                     return i;
                 }
             }
+            return UINT32_MAX;
         }
 
         std::optional<uint32_t> getRhombiIndexByPosition(const GridModel &model, const sf::Vector2f &position) const

@@ -96,7 +96,7 @@ namespace components
 
                 // snap to grid node if available
                 if (auto node = grid.findClosestNode(candidate))
-                    candidate = {node->point.x, node->point.y};
+                    candidate = {static_cast<float>(node->point.x), static_cast<float>(node->point.y)};
 
                 tryMove(candidate, others);
             }
@@ -134,7 +134,7 @@ namespace components
                         continue;
                     const auto &comp = *compPtr;
                     const auto polygon = comp.getTransformedPoints();
-                    if (pointInPolygon({node.point.x, node.point.y}, polygon))
+                    if (pointInPolygon({static_cast<float>(node.point.x), static_cast<float>(node.point.y)}, polygon))
                     {
                         node.isHighlighted = true;
                         break;

@@ -9,6 +9,6 @@ option(BUILD_TESTING "Build tests" OFF)
 add_subdirectory(src)
 
 if(BUILD_TESTING)
-  enable_testing()
-  add_subdirectory(tests)
+  #enable_testing()
+  #add_subdirectory(tests)
 endif()

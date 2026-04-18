@@ -14,7 +14,7 @@ public:
         std::unique_ptr<MovementStrategy> strategy)
     {
         strategies[&mover] = std::move(strategy);
-        strategies[&mover]->addMover(mover, {512, 4427, 122232, 345, 678, 2345});
+        strategies[&mover]->addMover(mover, {mover.getCurrentCellIndex() + 132}); // Initialize with current position
         movers.push_back(&mover);
         LOG_INFO("Mover ID: ", mover.getId(), " added to MovementSystem ", movers.size()," total movers.");
     }

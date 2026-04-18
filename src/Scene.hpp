@@ -13,13 +13,14 @@
 #include "MovementSystem.hpp"
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
-#include "ShootingSystem.hpp"
+#include "PathFollowingMovement.hpp"
 #include "FormationFactory.hpp"
+#include "ShootingSystem.hpp"
 
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), shootingSystem(grid) {}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), shootingSystem(grid){}
 
     void init()
     {
@@ -107,12 +108,31 @@ public:
         Farmer farmer4(grid, 18, homeTile9.getPosition() + sf::Vector2f{homeTile9.getSize().x / 2, homeTile9.getSize().y + 65}, homeTile9.getId());
         auto &farmer04 = componentManager.emplaceComponent<Farmer>(farmer4);
 
-
-
         auto farmers = formationFactory.createFormation<Farmer>(
             grid,
             3500,
             componentManager);
+
+        int idCounter = 19; 
+
+        for (const auto &pos : farmers)
+        {
+            LOG_INFO("Formation position: ", pos.x, ", ", pos.y);
+            auto& shooter = componentManager.emplaceComponent<Farmer>(grid, idCounter, pos, 3500);
+            shootingSystem.addShooter(shooter);
+            movementSystem.addMover(shooter, std::make_unique<PathFollowingMovement<1>>(grid));
+            idCounter++;
+        }
+
+        // // Add formation to manager
+        // std::vector<uint32_t> unitIds;
+        // std::vector<FormationOffset> offsets = DEFAULT_TROOP_PATTERN; // from FormationFactory
+        // for (auto* farmer : farmers)
+        // {
+        //     unitIds.push_back(farmer->getId());
+        //     movementSystem.addMover(*farmer, std::make_unique<PathFollowingMovement>());
+        // }
+        // formationMovementManager.addFormation(unitIds, 3500, offsets);
 
         LOG_INFO("Scene initialized.");
         // movementSystem.addMover(farmer01, {900, 3000});
@@ -145,6 +165,7 @@ public:
 
         movementSystem.update();
         shootingSystem.update();
+        //formationMovementManager.update();
 
         if (const auto *c = componentManager.getHoveredComponent(mouseWorld))
         {
@@ -165,8 +186,9 @@ public:
         shootingSystem.draw(target);
         tooltip.draw(target);
 
-        const auto& formationFactoryPositions = formationFactory.getFormationPositions();
-        for (const auto& pos : formationFactoryPositions)        {
+        const auto &formationFactoryPositions = formationFactory.getFormationPositions();
+        for (const auto &pos : formationFactoryPositions)
+        {
             sf::CircleShape circle(5.f);
             circle.setFillColor(sf::Color::Yellow);
             circle.setPosition(pos - sf::Vector2f(5.f, 5.f));
@@ -178,6 +200,14 @@ public:
     {
         componentManager.handleEvent(event, window);
         shootingSystem.handleEvent(event, window);
+    }
+
+    void moveFormationToMouse(const sf::RenderWindow &window)
+    {
+        sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
+        sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
+        // Assume formation index 0 for now
+        // formationMovementManager.moveFormationTo(0, mouseWorld);
     }
 
 private:
@@ -193,7 +223,7 @@ private:
 
     void updateOccupiedCells()
     {
-        std::cout << "Updating occupied rhombus cells based on component positions...\n";
+        LOG_INFO("Updating occupied cells in grid...");
         grid.resetOccupiedRhombus();
         for (const auto &component : componentManager.getComponents())
         {
@@ -201,7 +231,7 @@ private:
             {
                 if (component->contains(grid.getRhomusCenters()[i]))
                 {
-                    LOG_INFO("Added occupied index ", i);
+                    //LOG_INFO("Added occupied index ", i);
                     grid.updateOccupiedRhombus(i);
                 }
             }

@@ -9,10 +9,10 @@ namespace grid
     public:
         static bool pointInConvexQuad(const Rhombus &r, const sf::Vector2f &p)
         {
-            const sf::Vector2f a = {r.a.x, r.a.y};
-            const sf::Vector2f b = {r.b.x, r.b.y};
-            const sf::Vector2f c = {r.c.x, r.c.y};
-            const sf::Vector2f d = {r.d.x, r.d.y};
+            const sf::Vector2f a = {static_cast<float>(r.a.x), static_cast<float>(r.a.y)};
+            const sf::Vector2f b = {static_cast<float>(r.b.x), static_cast<float>(r.b.y)};
+            const sf::Vector2f c = {static_cast<float>(r.c.x), static_cast<float>(r.c.y)};
+            const sf::Vector2f d = {static_cast<float>(r.d.x), static_cast<float>(r.d.y)};
 
             float c1 = cross(a, b, p);
             float c2 = cross(b, c, p);

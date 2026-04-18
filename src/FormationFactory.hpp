@@ -18,12 +18,17 @@ public:
     {
         const auto &nodes = grid.getGridNodes();
 
-        formationPositions = grid.getCentersInSquare({nodes[centerIndex].point.x, nodes[centerIndex].point.y}, 200.f);
-        LOG_INFO("Found ", formationPositions.size(), " centers in square around center index ", centerIndex);
+        formationPositions = grid.getCentersInRhombus({static_cast<float>(nodes[centerIndex].point.x), static_cast<float>(nodes[centerIndex].point.y)}, 200.f, 100.f);
+        LOG_INFO("Found ", formationPositions.size(), " centers in rhombus around center index ", centerIndex);
         return formationPositions;
     }
 
     const std::vector<sf::Vector2f>& getFormationPositions() const
+    {
+        return formationPositions;
+    }
+
+    std::vector<sf::Vector2f>& getFormationPositions()
     {
         return formationPositions;
     }

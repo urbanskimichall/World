@@ -45,6 +45,10 @@ public:
                 // LOG_INFO("Generating paths...");
                 // scene.generatePaths();
             }
+            if (m.code == sf::Keyboard::Key::W)
+            {
+                scene.moveFormationToMouse(window);
+            }
         }
         scene.handleEvent(event, window);
     }

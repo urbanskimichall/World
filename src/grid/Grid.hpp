@@ -133,6 +133,38 @@ namespace grid
             return result;
         }
 
+        // --------------------------------------------------------------------
+        // Utility: return all rhombus centers that lie within an axis-aligned
+        // rhombus defined by its center and diagonal lengths. The rhombus has
+        // diagonals of length diagX (along x-axis) and diagY (along y-axis).
+        //
+        // Parameters:
+        //   rhombusCenter  center of the rhombus
+        //   diagX          length of the x-diagonal
+        //   diagY          length of the y-diagonal
+        //
+        // Returns:
+        //   vector of positions from the grid's rhombusCenters that fall inside.
+        std::vector<sf::Vector2f> getCentersInRhombus(const sf::Vector2f &rhombusCenter,
+                                                      float diagX,
+                                                      float diagY) const
+        {
+            std::vector<sf::Vector2f> result;
+            float halfX = diagX * 0.5f;
+            float halfY = diagY * 0.5f;
+
+            for (const auto &c : model.rhombusCenters)
+            {
+                float dx = std::abs(c.x - rhombusCenter.x);
+                float dy = std::abs(c.y - rhombusCenter.y);
+                if (dx / halfX + dy / halfY <= 1.0f)
+                {
+                    result.push_back(c);
+                }
+            }
+            return result;
+        }
+
     private:
         GridModel model;
         GridGenerator generator;
@@ -142,4 +174,57 @@ namespace grid
         std::vector<uint32_t> selectedRhombi;
         uint32_t highlightedIndex = UINT32_MAX;
     };
+
+    // ------------------------------------------------------------------------
+    // Free utility that operates directly on a vector of center positions.
+    // Returns any centers that fall inside a square region centered at
+    // `squareCenter` with the given `sideLength`.
+    inline std::vector<sf::Vector2f> getRhomusCentersInSquare(
+        const std::vector<sf::Vector2f> &centers,
+        const sf::Vector2f &squareCenter,
+        float sideLength)
+    {
+        std::vector<sf::Vector2f> result;
+        float half = sideLength * 0.5f;
+        float minX = squareCenter.x - half;
+        float maxX = squareCenter.x + half;
+        float minY = squareCenter.y - half;
+        float maxY = squareCenter.y + half;
+
+        for (const auto &c : centers)
+        {
+            if (c.x >= minX && c.x <= maxX && c.y >= minY && c.y <= maxY)
+            {
+                result.push_back(c);
+            }
+        }
+        return result;
+    }
+
+    // ------------------------------------------------------------------------
+    // Free utility that operates directly on a vector of center positions.
+    // Returns any centers that fall inside an axis-aligned rhombus defined by
+    // its center point, and the lengths of its diagonals (diagX and diagY).
+    // The rhombus is assumed to be axis-aligned, with diagonals along the x and y axes.
+    inline std::vector<sf::Vector2f> getRhomusCentersInRhombus(
+        const std::vector<sf::Vector2f> &centers,
+        const sf::Vector2f &rhombusCenter,
+        float diagX,
+        float diagY)
+    {
+        std::vector<sf::Vector2f> result;
+        float halfX = diagX * 0.5f;
+        float halfY = diagY * 0.5f;
+
+        for (const auto &c : centers)
+        {
+            float dx = std::abs(c.x - rhombusCenter.x);
+            float dy = std::abs(c.y - rhombusCenter.y);
+            if (dx / halfX + dy / halfY <= 1.0f)
+            {
+                result.push_back(c);
+            }
+        }
+        return result;
+    }
 }

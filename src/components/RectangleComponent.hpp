@@ -49,7 +49,7 @@ namespace components
             // --- 4) Snap world position to grid (based on min corner) ---
             sf::Vector2f worldPos = {minX, minY};
             if (auto node = grid.findClosestNode(worldPos))
-                worldPos = {node->point.x, node->point.y};
+                worldPos = {static_cast<float>(node->point.x), static_cast<float>(node->point.y)};
 
             // --- 5) Apply world transform ---
             shape.setPosition(worldPos);

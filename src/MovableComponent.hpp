@@ -100,7 +100,7 @@ public:
             currentSegment++;
 
             // Snap to end point for visual accuracy
-            mover.setPosition({p1.x, p1.y});
+            mover.setPosition({static_cast<float>(p1.x), static_cast<float>(p1.y)});
             movementState = MovementStep::CHECKPOINT_REACHED;
             return movementState;
         }
@@ -165,6 +165,12 @@ public:
     {
         sf::FloatRect bounds = mover.getGlobalBounds();
         return {bounds.size.x, bounds.size.y};
+    }
+
+    uint32_t getCurrentCellIndex() const
+    {
+        sf::Vector2f pos = getPosition();
+        return grid.getRhombiIndexByPosition(pos).value_or(UINT32_MAX);
     }
 
 protected:

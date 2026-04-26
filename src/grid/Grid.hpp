@@ -53,6 +53,7 @@ namespace grid
             const uint32_t index =
                 selector.selectRhombusAtMouse(model, mousePos, selectedRhombi);
         }
+
         void unselectRhombusAtMouse(const sf::Vector2f &mousePos)
         {
             selector.unselectRhombusAtMouse(model, mousePos, selectedRhombi);

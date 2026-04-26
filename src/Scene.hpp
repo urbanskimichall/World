@@ -181,8 +181,8 @@ public:
     {
         componentManager.draw(target);
 
-        // sf::FloatRect bounds = getViewBounds(target);
-        // grid.draw(target, bounds);
+         sf::FloatRect bounds = getViewBounds(target);
+         grid.draw(target, bounds);
         shootingSystem.draw(target);
         tooltip.draw(target);
 

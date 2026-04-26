@@ -2,6 +2,7 @@
 #include "../Logger.hpp"
 #include "GridSpacing.hpp"
 #include <cmath>
+#include <limits>
 #include <unordered_set>
 #include <queue>
 
@@ -56,15 +57,48 @@ namespace grid
     {
         model.nodes.clear();
 
+        double minX = std::numeric_limits<double>::max();
+        double maxX = std::numeric_limits<double>::lowest();
+        double minY = std::numeric_limits<double>::max();
+        double maxY = std::numeric_limits<double>::lowest();
+
+        LOG_INFO("numOfRows: ", numOfRows, " numOfCols: ", numOfCols);
         for (uint32_t row = 0; row < numRows; ++row)
         {
-            double y = row * (diagY / 2.0);
+            const double y = row * (diagY / 2.0);
             for (uint32_t col = 0; col < numCols; ++col)
             {
-                double x = col * (diagX / 2.0) + ((row % 2) ? diagX / 4.0 : 0.0);
-                model.nodes.emplace_back(Node{.point = {x, y}});
+
+                const double x = col * (diagX / 2.0) + ((row % 2) ? diagX / 4.0 : 0.0);
+
+                minX = std::min(minX, x);
+                maxX = std::max(maxX, x);
+                minY = std::min(minY, y);
+                maxY = std::max(maxY, y);
+
+                const bool isBoundary =
+                    (row == 0) ||
+                    (row == numRows - 1) ||
+                    (col == 0) ||
+                    (col == numCols - 1);
+                model.nodes.emplace_back(Node{
+                    .point = {x, y}, .isBoundary = isBoundary});
             }
         }
+
+        const double epsX = diagX * 0.3;
+        const double epsY = diagY * 0.3;
+
+        // for (auto &node : model.nodes)
+        // {
+        //     const auto &p = node.point;
+
+        //     node.isBoundary =
+        //         p.x <= minX + epsX ||
+        //         p.x >= maxX - epsX ||
+        //         p.y <= minY + epsY ||
+        //         p.y >= maxY - epsY;
+        // }
 
         auto index = [numCols](int r, int c)
         { return r * numCols + c; };
@@ -106,10 +140,11 @@ namespace grid
     {
         model.rhombi.clear();
         model.rhombusCenters.clear();
+        model.rhombusCentersPoints.clear();
         model.rhombusNeighbors.clear();
         model.neighborIndices.clear();
 
-        for (const auto &node : model.nodes)
+        for (auto &node : model.nodes)
         {
             auto maybeRh = generateSingleRhombus(node);
             if (!maybeRh)
@@ -124,7 +159,35 @@ namespace grid
             model.rhombusNeighbors.push_back(generateNeighbourCenters(c, shiftToNeighbour));
         }
 
-        LOG_INFO("Generated ", model.rhombi.size(), " rhombi");
+        float minCx = std::numeric_limits<float>::max();
+        float maxCx = std::numeric_limits<float>::lowest();
+        float minCy = std::numeric_limits<float>::max();
+        float maxCy = std::numeric_limits<float>::lowest();
+
+        for (const auto &center : model.rhombusCenters)
+        {
+            minCx = std::min(minCx, center.x);
+            maxCx = std::max(maxCx, center.x);
+            minCy = std::min(minCy, center.y);
+            maxCy = std::max(maxCy, center.y);
+        }
+
+        constexpr float epsX = grid::RHOMBUS_DIAG_X / 24.0f;
+        constexpr float epsY = grid::RHOMBUS_DIAG_Y / 24.0f;
+
+        uint32_t index = 0;
+        for (const auto &center : model.rhombusCenters)
+        {
+            bool rhombusBoundary =
+                (center.x <= minCx + epsX) ||
+                (center.x >= maxCx - epsX) ||
+                (center.y <= minCy + epsY) ||
+                (center.y >= maxCy - epsY);
+            model.nodes[index].isBoundary = rhombusBoundary;
+            ++index;
+        }
+
+        LOG_INFO("Generated ", model.rhombi.size(), " rhombi", " minCx: ", minCx, " maxCx: ", maxCx, " minCy: ", minCy, " maxCy: ", maxCy);
     }
 
     std::optional<Rhombus> GridGenerator::generateSingleRhombus(const Node &node)

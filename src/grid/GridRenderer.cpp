@@ -41,7 +41,7 @@ namespace grid
             shape.setPoint(2, {rh.c.x, rh.c.y});
             shape.setPoint(3, {rh.d.x, rh.d.y});
 
-            if (i == highlightedIndex)
+            if (i == highlightedIndex or model.nodes[i].isBoundary)
             {
                 shape.setFillColor(sf::Color(255, 0, 0, 50));
                 shape.setOutlineColor(sf::Color::Red);

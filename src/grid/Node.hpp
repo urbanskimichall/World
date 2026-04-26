@@ -10,9 +10,10 @@ namespace grid
     struct Node
     {
         Point point;
-        bool isHighlighted = false;
         std::vector<Node *> neighbors;
         std::vector<Node *> rightNeighbors;
+        bool isHighlighted{false};
+        bool isBoundary{false};
         double distanceOnYAxis(const Node &other) const
         {
             return std::abs(point.y - other.point.y);

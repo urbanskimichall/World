@@ -17,6 +17,7 @@
 #include "FormationFactory.hpp"
 #include "ShootingSystem.hpp"
 #include "SceneBoundaries.hpp"
+#include "grid/GridSpacing.hpp"
 
 class Scene
 {
@@ -216,9 +217,9 @@ public:
         //TODO 1: make this dynamic based on the actual scene content
         return SceneBoundaries{
             .left = 0.f,
-            .right = 1600.f,
+            .right = grid::numOfCols * grid::RHOMBUS_DIAG_X / 2.f,
             .top = 0.f,
-            .bottom = 800.f
+            .bottom = grid::numOfRows * grid::RHOMBUS_DIAG_Y / 2.f
         };
     }
 

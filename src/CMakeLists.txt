@@ -31,7 +31,7 @@ endif()
 add_executable(${PROJECT_NAME}
     main.cpp grid/Grid.cpp grid/Grid.hpp grid/GridGenerator.cpp grid/GridRenderer.cpp grid/GridSelector.cpp
      World.hpp World.cpp Scene.hpp components/Component.hpp
-    components/ComponentManager.cpp components/ComponentManager.hpp 
+    components/ComponentManager.cpp components/ComponentManager.hpp ViewController.hpp ViewController.cpp
     grid/Pathfinder.cpp grid/Pathfinder.hpp components/BoxInfo.cpp LoopableMovement.hpp LoopableMovement.cpp
 )
 

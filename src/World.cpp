@@ -7,6 +7,7 @@
 #include "EventHandler.hpp"
 #include "FpsCounter.hpp"
 #include "Logger.hpp"
+#include "SceneBoundaries.hpp"
 
 void World::create()
 {
@@ -19,7 +20,8 @@ void World::create()
 
     Scene scene;
     scene.init();
-    ViewController viewController(view);
+    const auto sceneBoundaries = scene.getSceneBoundaries();
+    ViewController viewController(view, sceneBoundaries);
     EventHandler eventHandler;
     FpsCounter fpsCounter;
             

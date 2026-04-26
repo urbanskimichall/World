@@ -16,6 +16,7 @@
 #include "PathFollowingMovement.hpp"
 #include "FormationFactory.hpp"
 #include "ShootingSystem.hpp"
+#include "SceneBoundaries.hpp"
 
 class Scene
 {
@@ -208,6 +209,17 @@ public:
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
         // Assume formation index 0 for now
         // formationMovementManager.moveFormationTo(0, mouseWorld);
+    }
+
+    SceneBoundaries getSceneBoundaries() const
+    {
+        //TODO 1: make this dynamic based on the actual scene content
+        return SceneBoundaries{
+            .left = 0.f,
+            .right = 1600.f,
+            .top = 0.f,
+            .bottom = 800.f
+        };
     }
 
 private:

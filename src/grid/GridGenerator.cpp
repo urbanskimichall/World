@@ -31,7 +31,7 @@ namespace grid
         {
             for (const auto &p : model.rhombusNeighbors[i])
             {
-                sf::Vector2f v{p.x, p.y};
+                sf::Vector2f v{static_cast<float>(p.x), static_cast<float>(p.y)};
                 auto it = model.centerIndexLookup.find(hashVec(v));
                 if (it != model.centerIndexLookup.end())
                 {

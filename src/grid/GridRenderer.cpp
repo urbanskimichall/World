@@ -11,11 +11,11 @@ namespace grid
         sf::VertexArray points(sf::PrimitiveType::Points);
         for (const auto &node : model.nodes)
         {
-            if (!bounds.contains({node.point.x, node.point.y}))
+            if (!bounds.contains({static_cast<float>(node.point.x), static_cast<float>(node.point.y)}))
                 continue;
 
             sf::Color color = node.isHighlighted ? sf::Color::Red : sf::Color::Blue;
-            points.append(sf::Vertex({node.point.x, node.point.y}, color));
+            points.append(sf::Vertex({static_cast<float>(node.point.x), static_cast<float>(node.point.y)}, color));
         }
         window.draw(points);
     }
@@ -25,10 +25,10 @@ namespace grid
     {
         auto isVisible = [&](const Rhombus &r)
         {
-            return bounds.contains({r.a.x, r.a.y}) ||
-                   bounds.contains({r.b.x, r.b.y}) ||
-                   bounds.contains({r.c.x, r.c.y}) ||
-                   bounds.contains({r.d.x, r.d.y});
+            return bounds.contains({static_cast<float>(r.a.x), static_cast<float>(r.a.y)}) ||
+                   bounds.contains({static_cast<float>(r.b.x), static_cast<float>(r.b.y)}) ||
+                   bounds.contains({static_cast<float>(r.c.x), static_cast<float>(r.c.y)}) ||
+                   bounds.contains({static_cast<float>(r.d.x), static_cast<float>(r.d.y)});
         };
 
         const bool drawAllRhombi = drawMask.test(static_cast<size_t>(DrawElement::Rhombi));
@@ -58,10 +58,10 @@ namespace grid
 
             sf::ConvexShape shape;
             shape.setPointCount(4);
-            shape.setPoint(0, {rh.a.x, rh.a.y});
-            shape.setPoint(1, {rh.b.x, rh.b.y});
-            shape.setPoint(2, {rh.c.x, rh.c.y});
-            shape.setPoint(3, {rh.d.x, rh.d.y});
+            shape.setPoint(0, {static_cast<float>(rh.a.x), static_cast<float>(rh.a.y)});
+            shape.setPoint(1, {static_cast<float>(rh.b.x), static_cast<float>(rh.b.y)});
+            shape.setPoint(2, {static_cast<float>(rh.c.x), static_cast<float>(rh.c.y)});
+            shape.setPoint(3, {static_cast<float>(rh.d.x), static_cast<float>(rh.d.y)});
 
             if (highlighted && drawHighlighted)
             {

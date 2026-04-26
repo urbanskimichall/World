@@ -214,7 +214,6 @@ public:
 
     SceneBoundaries getSceneBoundaries() const
     {
-        //TODO 1: make this dynamic based on the actual scene content
         return SceneBoundaries{
             .left = 0.f,
             .right = grid::numOfCols * grid::RHOMBUS_DIAG_X / 2.f,

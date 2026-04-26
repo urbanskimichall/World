@@ -1,7 +1,5 @@
 #include "World.hpp"
-#include "components/RectangleComponent.hpp"
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "Scene.hpp"
 #include "ViewController.hpp"
 #include "EventHandler.hpp"
@@ -24,7 +22,6 @@ void World::create()
     ViewController viewController(view, sceneBoundaries);
     EventHandler eventHandler;
     FpsCounter fpsCounter;
-            
 
     while (window.isOpen())
     {

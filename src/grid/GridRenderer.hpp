@@ -1,23 +1,11 @@
 #pragma once
+
 #include "GridModel.hpp"
+#include "DrawMask.hpp"
 #include <SFML/Graphics.hpp>
-#include <bitset>
 
 namespace grid
 {
-    enum class DrawElement : size_t
-    {
-        NodePoints = 0,
-        Rhombi,
-        HighlightedRhombi,
-        SelectedRhombi,
-        OccupiedDots,
-        BoundaryRhombi,
-        Count
-    };
-
-    using DrawMask = std::bitset<static_cast<size_t>(DrawElement::Count)>;
-
     class GridRenderer
     {
     public:
@@ -26,8 +14,7 @@ namespace grid
                         uint32_t highlightedIndex, const std::vector<uint32_t> &selectedIndices) const;
 
     private:
-        static DrawMask defaultDrawMask()
-        {
+        DrawMask drawMask{[]() {
             DrawMask mask;
             mask.set(static_cast<size_t>(DrawElement::NodePoints));
             mask.set(static_cast<size_t>(DrawElement::Rhombi));
@@ -36,8 +23,6 @@ namespace grid
             mask.set(static_cast<size_t>(DrawElement::OccupiedDots));
             mask.set(static_cast<size_t>(DrawElement::BoundaryRhombi));
             return mask;
-        }
-
-        DrawMask drawMask{defaultDrawMask()};
+        }()};
     };
 }

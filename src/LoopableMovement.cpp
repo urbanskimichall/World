@@ -3,7 +3,7 @@
 #include <queue>
 #include <unordered_set>
 
-void LoopableMovement::addMover(MovableComponent &mover, const std::vector<uint32_t> &destinationIndices)
+void LoopableMovement::addMover(MovableComponent &mover)
 {
     LOG_INFO("Adding loopable mover ID: ", mover.getId(), " to MovementSystem.");
     

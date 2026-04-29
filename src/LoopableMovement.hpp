@@ -10,9 +10,9 @@
 class LoopableMovement : public MovementStrategy
 {
 public:
-    LoopableMovement(const grid::Grid &grid) : grid(grid) {}
+    LoopableMovement(const grid::Grid &grid, const std::vector<uint32_t> &destinationIndices) : grid(grid), destinationIndices(destinationIndices) {}
 
-    void addMover(MovableComponent &mover, const std::vector<uint32_t> &destinationIndices) override;
+    void addMover(MovableComponent &mover) override;
 
     void update(MovableComponent &mover) override;
 
@@ -40,4 +40,5 @@ private:
     const grid::Grid &grid;
     // std::vector<MovableComponent *> movers;
     std::unordered_map<MovableComponent *, PathContext> pathContexts;
+    const std::vector<uint32_t> destinationIndices;
 };

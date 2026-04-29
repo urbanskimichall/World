@@ -26,32 +26,6 @@ public:
 
     void init()
     {
-        std::array<sf::Vector2f, 4> rectanglePoints = {
-            sf::Vector2f(50.f, 50.f),
-            sf::Vector2f(200.f, 50.f),
-            sf::Vector2f(200.f, 150.f),
-            sf::Vector2f(50.f, 150.f)};
-
-        std::array<sf::Vector2f, 4> parallerogramPoints1 = {
-            sf::Vector2f(200.f, 200.f),
-            sf::Vector2f(320.f, 200.f),
-            sf::Vector2f(340.f, 280.f),
-            sf::Vector2f(220.f, 280.f)};
-
-        std::array<sf::Vector2f, 4> parallerogramPoints2 = {
-            sf::Vector2f(400.f, 200.f),
-            sf::Vector2f(520.f, 200.f),
-            sf::Vector2f(540.f, 280.f),
-            sf::Vector2f(420.f, 280.f)};
-
-        // componentManager.emplaceComponent<components::RectangleComponent>(grid, rectanglePoints, sf::Color::Green);
-        // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints1, sf::Color::Green);
-        // componentManager.emplaceComponent<components::RectangleComponent>(grid, parallerogramPoints2, sf::Color::Green);
-
-        // mover.init();
-
-        const float tileWidth = 100.f;
-        const float tileHeight = 50.f;
         std::string homeLevel1 = "assets/simple_home_level_1.png";
         std::string homeLevel2 = "assets/simple_home_level_2.png";
         std::string homeLevel3 = "assets/simple_home_level_3.png";
@@ -65,12 +39,6 @@ public:
         std::string fieldLevel1 = "assets/simple_field_level_1.png";
         std::string treeLevel1 = "assets/simple_tree_level_1.png";
 
-        std::array<sf::Vector2f, 4> parallerogramHomeLevel7 = {
-            sf::Vector2f(450.f, 200.f),
-            sf::Vector2f(540.f, 150.f),
-            sf::Vector2f(630.f, 200.f),
-            sf::Vector2f(530.f, 240.f)};
-        // componentManager.emplaceComponent<components::RectangleComponent>(grid, 0, parallerogramHomeLevel7, sf::Color::Green);
         // HomeTile homeTile(grid, 0, {450, 200}, homeLevel7);
         // componentManager.emplaceComponent<HomeTile>(homeTile);
         // HomeTile homeTile2(grid, 1, {200, 50}, homeLevel1);
@@ -81,26 +49,26 @@ public:
         // componentManager.emplaceComponent<HomeTile>(homeTile4);
         HomeTile homeTile5(grid, 4, {50, 25}, homeLevel5);
         componentManager.emplaceComponent<HomeTile>(homeTile5);
-        // HomeTile homeTile6(grid, 5, {300, 50}, fieldLevel1);
-        // componentManager.emplaceComponent<HomeTile>(homeTile6);
-        // HomeTile homeTile7(grid, 6, {150, 75}, treeLevel1);
-        // componentManager.emplaceComponent<HomeTile>(homeTile7);
-        // HomeTile homeTile8(grid, 7, {600, 300}, homeLevel8);
-        // componentManager.emplaceComponent<HomeTile>(homeTile8);
+        HomeTile homeTile6(grid, 5, {300, 50}, fieldLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile6);
+        HomeTile homeTile7(grid, 6, {150, 75}, treeLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile7);
+        HomeTile homeTile8(grid, 7, {600, 300}, homeLevel8);
+        componentManager.emplaceComponent<HomeTile>(homeTile8);
         HomeTile homeTile9(grid, 8, {700, 350}, homeLevel9);
         componentManager.emplaceComponent<HomeTile>(homeTile9);
         HomeTile homeTile10(grid, 9, {800, 400}, homeLevel10);
         componentManager.emplaceComponent<HomeTile>(homeTile10);
         HomeTile homeTile11(grid, 10, {400, 150}, homeLevel6);
         componentManager.emplaceComponent<HomeTile>(homeTile11);
-        // HomeTile homeTile12(grid, 11, {350, 125}, homeLevel3);
-        // componentManager.emplaceComponent<HomeTile>(homeTile12);
-        // HomeTile homeTile13(grid, 12, {500, 250}, homeLevel2);
-        // componentManager.emplaceComponent<HomeTile>(homeTile13);
-        // HomeTile homeTile14(grid, 13, {550, 275}, homeLevel1);
-        // componentManager.emplaceComponent<HomeTile>(homeTile14);
-        // HomeTile homeTile15(grid, 14, {750, 375}, homeLevel5);
-        // componentManager.emplaceComponent<HomeTile>(homeTile15);
+        HomeTile homeTile12(grid, 11, {350, 125}, homeLevel3);
+        componentManager.emplaceComponent<HomeTile>(homeTile12);
+        HomeTile homeTile13(grid, 12, {500, 250}, homeLevel2);
+        componentManager.emplaceComponent<HomeTile>(homeTile13);
+        HomeTile homeTile14(grid, 13, {550, 275}, homeLevel1);
+        componentManager.emplaceComponent<HomeTile>(homeTile14);
+        HomeTile homeTile15(grid, 14, {750, 375}, homeLevel5);
+        componentManager.emplaceComponent<HomeTile>(homeTile15);
         Farmer farmer1(grid, 15, homeTile10.getPosition() + sf::Vector2f{homeTile10.getSize().x / 2, homeTile10.getSize().y + 65}, homeTile10.getId());
         auto &farmer01 = componentManager.emplaceComponent<Farmer>(farmer1);
         Farmer farmer2(grid, 16, homeTile11.getPosition() + sf::Vector2f{homeTile11.getSize().x / 2, homeTile11.getSize().y - 15}, homeTile11.getId());
@@ -139,9 +107,10 @@ public:
         LOG_INFO("Scene initialized.");
         // movementSystem.addMover(farmer01, {900, 3000});
         // movementSystem.addMover(farmer02, {345, 4000});
-        movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid));
-        movementSystem.addMover(farmer02, std::make_unique<TargetOrientedMovement>(grid));
-        movementSystem.addMover(farmer01, std::make_unique<TargetOrientedMovement>(grid));
+        const auto destinations = std::vector<uint32_t>{132, 498, 324, 1890};
+        movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid, destinations));
+        movementSystem.addMover(farmer02, std::make_unique<LoopableMovement>(grid, destinations));
+        movementSystem.addMover(farmer01, std::make_unique<LoopableMovement>(grid, destinations));
         movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
 
         shootingSystem.addShooter(farmer01);

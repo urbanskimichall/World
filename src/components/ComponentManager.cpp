@@ -7,17 +7,18 @@ void ComponentManager::onComponentMoved()
 {
     grid.resetOccupiedRhombus(); // optional: clear previous markings
 
-    for (const auto &component : components)
-    {
-        for (uint32_t i = 0; i < grid.getRhomusCenters().size(); i++)
-        {
-            if (component->contains(grid.getRhomusCenters()[i]))
-            {
-                grid.updateOccupiedRhombus(i);
-            }
-        }
-    }
-    sortComponentsByYPosition();
+    // for (const auto &component : components)
+    // {
+    //     for (uint32_t i = 0; i < grid.getRhomusCenters().size(); i++)
+    //     {
+    //         //BOTTLENECK: this is O(n*m) where n is components count and m is rhombi count; consider spatial partitioning for optimization
+    //         if (component->contains(grid.getRhomusCenters()[i]))
+    //         {
+    //             grid.updateOccupiedRhombus(i);
+    //         }
+    //     }
+    // }
+     sortComponentsByYPosition();
 
     LOG_INFO("Updated occupied rhombi for moved component.");
 }

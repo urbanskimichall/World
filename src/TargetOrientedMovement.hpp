@@ -9,7 +9,7 @@ class TargetOrientedMovement : public MovementStrategy
 public:
     TargetOrientedMovement(const grid::Grid &grid) : grid(grid) {}
 
-    void addMover(MovableComponent &mover, const std::vector<uint32_t> &destinationIndices) override
+    void addMover(MovableComponent &mover) override
     {
         LOG_INFO("Adding target-oriented mover ID: ", mover.getId(), " to MovementSystem.");
         moverToHighlightedIndex[&mover] = UINT32_MAX;

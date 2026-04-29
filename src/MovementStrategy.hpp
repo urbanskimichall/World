@@ -10,6 +10,6 @@ class MovementStrategy
 public:
     virtual ~MovementStrategy() = default;
 
-    virtual void addMover(MovableComponent& mover, const std::vector<uint32_t> &destinationIndices) = 0;
+    virtual void addMover(MovableComponent& mover) = 0;
     virtual void update(MovableComponent &mover) = 0;
 };

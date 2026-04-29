@@ -11,11 +11,11 @@ class PathFollowingMovement : public MovementStrategy
 public:
     PathFollowingMovement(const grid::Grid &grid) : grid(grid) {}
 
-    void addMover(MovableComponent &mover, const std::vector<uint32_t> &destinationIndices) override
+    void addMover(MovableComponent &mover) override
     {
         LOG_INFO("Adding mover ID: ", mover.getId(), " to PathFollowingMovement with formation ID: ", formationId);
         initPosistionIndex[&mover] = mover.getCurrentCellIndex();
-        setDestination(mover, destinationIndices[0]);
+        setDestination(mover, 1250); // to do: calculate destination based on formation pattern and current position
     }
 
     void update(MovableComponent &mover) override

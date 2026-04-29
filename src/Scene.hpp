@@ -10,6 +10,7 @@
 #include "HomeTile.hpp"
 #include "Tooltip.hpp"
 #include "Farmer.hpp"
+#include "FarmerPath.hpp"
 #include "MovementSystem.hpp"
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
@@ -107,10 +108,12 @@ public:
         LOG_INFO("Scene initialized.");
         // movementSystem.addMover(farmer01, {900, 3000});
         // movementSystem.addMover(farmer02, {345, 4000});
-        const auto destinations = std::vector<uint32_t>{132, 498, 324, 1890};
+
+        const FarmerPath path{.homeIndex = homeTile10.getCurrentCellIndex(), .fieldIndex = homeTile6.getCurrentCellIndex(), .storageIndex = homeTile5.getCurrentCellIndex()};
+        const auto destinations = FarmerPathFactory::getPathIndices(path);
         movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid, destinations));
-        movementSystem.addMover(farmer02, std::make_unique<LoopableMovement>(grid, destinations));
-        movementSystem.addMover(farmer01, std::make_unique<LoopableMovement>(grid, destinations));
+        //movementSystem.addMover(farmer02, std::make_unique<LoopableMovement>(grid, destinations));
+        //movementSystem.addMover(farmer01, std::make_unique<LoopableMovement>(grid, destinations));
         movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
 
         shootingSystem.addShooter(farmer01);

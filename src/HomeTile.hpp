@@ -56,6 +56,13 @@ public:
         return {sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y};
     }
 
+    uint32_t getCurrentCellIndex() const
+    {
+        sf::Vector2f center = {sprite.getPosition().x + sprite.getGlobalBounds().size.x / 2,
+                               sprite.getPosition().y + (sprite.getGlobalBounds().size.y / 2) + 50.f};
+        return grid.getRhombiIndexByPosition(center).value_or(UINT32_MAX);
+    }
+
 private:
     sf::Sprite sprite;
     sf::RectangleShape occupiedZone;

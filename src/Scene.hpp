@@ -12,6 +12,7 @@
 #include "Farmer.hpp"
 #include "FarmerPath.hpp"
 #include "MovementSystem.hpp"
+#include "EventBus.hpp"
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
 #include "PathFollowingMovement.hpp"
@@ -27,6 +28,7 @@ public:
 
     void init()
     {
+        initEventSubscriptions();
         std::string homeLevel1 = "assets/simple_home_level_1.png";
         std::string homeLevel2 = "assets/simple_home_level_2.png";
         std::string homeLevel3 = "assets/simple_home_level_3.png";
@@ -86,14 +88,14 @@ public:
 
         int idCounter = 19; 
 
-        for (const auto &pos : farmers)
-        {
-            LOG_INFO("Formation position: ", pos.x, ", ", pos.y);
-            auto& shooter = componentManager.emplaceComponent<Farmer>(grid, idCounter, pos, 3500);
-            shootingSystem.addShooter(shooter);
-            movementSystem.addMover(shooter, std::make_unique<PathFollowingMovement<1>>(grid));
-            idCounter++;
-        }
+        // for (const auto &pos : farmers)
+        // {
+        //     LOG_INFO("Formation position: ", pos.x, ", ", pos.y);
+        //     auto& shooter = componentManager.emplaceComponent<Farmer>(grid, idCounter, pos, 3500);
+        //     shootingSystem.addShooter(shooter);
+        //     movementSystem.addMover(shooter, std::make_unique<PathFollowingMovement<1>>(grid));
+        //     idCounter++;
+        // }
 
         // // Add formation to manager
         // std::vector<uint32_t> unitIds;
@@ -114,7 +116,7 @@ public:
         movementSystem.addMover(farmer03, std::make_unique<LoopableMovement>(grid, destinations));
         //movementSystem.addMover(farmer02, std::make_unique<LoopableMovement>(grid, destinations));
         //movementSystem.addMover(farmer01, std::make_unique<LoopableMovement>(grid, destinations));
-        movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
+        //movementSystem.addMover(farmer04, std::make_unique<TargetOrientedMovement>(grid));
 
         shootingSystem.addShooter(farmer01);
         shootingSystem.addShooter(farmer02);
@@ -195,6 +197,14 @@ public:
     }
 
 private:
+    void initEventSubscriptions()
+    {
+        eventBus.subscribe([this](const MoverReachedIndexEvent& event)
+        {
+            LOG_INFO("Received MoverReachedIndexEvent for mover ID ", event.mover->getId(), " at index ", event.index);
+        });
+    }
+
     sf::FloatRect getViewBounds(const sf::RenderWindow &window) const
     {
         sf::View view = window.getView();
@@ -225,7 +235,8 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Tooltip tooltip;
-    MovementSystem movementSystem;
+    EventBus eventBus{};
+    MovementSystem movementSystem{eventBus};
     ShootingSystem shootingSystem;
     FormationFactory formationFactory;
 };

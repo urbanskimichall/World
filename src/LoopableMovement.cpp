@@ -27,7 +27,7 @@ void LoopableMovement::addMover(MovableComponent &mover)
     setDestination(mover);
 }
 
-void LoopableMovement::update(MovableComponent &mover)
+uint16_t LoopableMovement::update(MovableComponent &mover)
 {
     auto step = mover.updateMover(grid.getRhomusCentersPoints());
 
@@ -38,9 +38,12 @@ void LoopableMovement::update(MovableComponent &mover)
 
     if (step == MovementStep::END_REACHED)
     {
-        LOG_INFO("Mover ID ", mover.getId(), " reached its destination.");
+        const auto currentStep = pathContexts[&mover].currentStep;
         setDestination(mover);
+        LOG_INFO("Mover ID ", mover.getId(), " reached its destination. current step: ", currentStep, " next step: ",  pathContexts[&mover].currentStep, " Next destination index: ", pathContexts[&mover].destinationIndices[currentStep]);
+        return currentStep;
     }
+    return 0xFFFF;
 }
 
 void LoopableMovement::setDestination(MovableComponent &mover, bool shouldRecalculatePath)

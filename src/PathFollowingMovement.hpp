@@ -18,7 +18,7 @@ public:
         setDestination(mover, 1250); // to do: calculate destination based on formation pattern and current position
     }
 
-    void update(MovableComponent &mover) override
+    uint16_t update(MovableComponent &mover) override
     {
         auto step = mover.updateMover(grid.getRhomusCentersPoints());
 
@@ -28,6 +28,7 @@ public:
             // For now, just set the same destination again to keep it moving
             setDestination(mover, mover.getCurrentCellIndex() + 12110);
         }
+        return 1;
     }
 
 private:

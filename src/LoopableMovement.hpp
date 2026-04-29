@@ -14,7 +14,7 @@ public:
 
     void addMover(MovableComponent &mover) override;
 
-    void update(MovableComponent &mover) override;
+    uint16_t update(MovableComponent &mover) override;
 
 private:
     struct PathContext

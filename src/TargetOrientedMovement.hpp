@@ -17,25 +17,25 @@ public:
         setDestination(mover);
     }
 
-    void update(MovableComponent &mover) override
+    uint16_t update(MovableComponent &mover) override
     {
         auto step = mover.updateMover(grid.getRhomusCentersPoints());
         const std::optional<uint32_t> highlightedIndexOpt = grid.getHighlightedIndexIfNotOccupied();
         if (!highlightedIndexOpt)
         {
             // LOG_WARN("Target oriented: No valid highlighted rhombus under mouse for mover ID: ", mover.getId());
-            return;
+            return 0;
         }
         if (highlightedIndexOpt.value() == UINT32_MAX)
         {
             LOG_WARN("Target oriented: Highlighted rhombus under mouse is invalid for mover ID: ", mover.getId());
-            return;
+            return 0;
         }
         const uint32_t highlightedIndex = highlightedIndexOpt.value();
         uint32_t &currentHighlightedIndex = moverToHighlightedIndex[&mover];
         if (step == MovementStep::CHECKPOINT_REACHED and not checkIfRemainignPathValid(mover))
         {
-            return;
+            return 0;
         }
         if (currentHighlightedIndex != highlightedIndex)
         {

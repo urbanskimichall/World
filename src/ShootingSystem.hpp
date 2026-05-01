@@ -2,12 +2,13 @@
 
 #include "MovableComponent.hpp"
 #include "Bullet.hpp"
+#include "event/Channel.hpp"
 #include "grid/Grid.hpp"
 
 class ShootingSystem
 {
 public:
-    ShootingSystem(const grid::Grid &grid) : grid(grid) {}
+    ShootingSystem(const grid::Grid &grid, event::Channel<ShootEvent> &shootChannel) : grid(grid), shootChannel(shootChannel) {}
 
     void addShooter(MovableComponent &shooter)
     {
@@ -35,6 +36,8 @@ public:
                     bulletCtx.bullet.setPosition(
                         bulletCtx.parabolicPath.back());
                     bulletCtx.bullet.setActive(false);
+
+                    shootChannel.publish(ShootEvent{shooterCtx.shooter->getId()});
 
                     it = shooterCtx.bullets.erase(it); // remove finished bullet
                     continue;
@@ -171,6 +174,7 @@ private:
     }
 
     const grid::Grid &grid;
+    event::Channel<ShootEvent> &shootChannel;
 
     std::vector<ShootContext> shootContexts;
 };

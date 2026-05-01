@@ -12,7 +12,7 @@
 #include "Farmer.hpp"
 #include "FarmerPath.hpp"
 #include "MovementSystem.hpp"
-#include "EventBus.hpp"
+#include "event/Channel.hpp"
 #include "LoopableMovement.hpp"
 #include "TargetOrientedMovement.hpp"
 #include "PathFollowingMovement.hpp"
@@ -24,7 +24,7 @@
 class Scene
 {
 public:
-    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid), shootingSystem(grid){}
+    Scene() : grid(grid::numOfRows, grid::numOfCols), componentManager(grid){}
 
     void init()
     {
@@ -199,9 +199,14 @@ public:
 private:
     void initEventSubscriptions()
     {
-        eventBus.subscribe([this](const MoverReachedIndexEvent& event)
+        movementChannel.subscribe([this](const MovementStepEvent& event)
         {
-            LOG_INFO("Received MoverReachedIndexEvent for mover ID ", event.mover->getId(), " at index ", event.index);
+            LOG_INFO("Received MovementStepEvent for entity ID ", event.entityId, " at step ", event.step);
+        });
+
+        shootChannel.subscribe([this](const ShootEvent& event)
+        {
+            LOG_INFO("Received ShootEvent (shoot reached target) for entity ID ", event.entityId);
         });
     }
 
@@ -235,8 +240,11 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Tooltip tooltip;
-    EventBus eventBus{};
-    MovementSystem movementSystem{eventBus};
-    ShootingSystem shootingSystem;
+    //EventBus eventBus{};
+
+    event::Channel<MovementStepEvent> movementChannel;
+    MovementSystem movementSystem{movementChannel};
+    event::Channel<ShootEvent> shootChannel;
+    ShootingSystem shootingSystem{grid, shootChannel};
     FormationFactory formationFactory;
 };

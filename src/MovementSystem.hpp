@@ -6,12 +6,12 @@
 #include <functional>
 #include "MovableComponent.hpp"
 #include "MovementStrategy.hpp"
-#include "EventBus.hpp"
+#include "event/Channel.hpp"
 
 class MovementSystem
 {
 public:
-    MovementSystem(EventBus &eventBus) : eventBus(eventBus) {}
+    MovementSystem(event::Channel<MovementStepEvent> &movementChannel) : movementChannel(movementChannel) {}
 
     void addMover(
         MovableComponent &mover,
@@ -20,6 +20,7 @@ public:
         strategies[&mover] = std::move(strategy);
         strategies[&mover]->addMover(mover); // Initialize with current position
         movers.push_back(&mover);
+
         LOG_INFO("Mover ID: ", mover.getId(), " added to MovementSystem ", movers.size(), " total movers.");
     }
 
@@ -28,12 +29,14 @@ public:
         for (auto *mover : movers)
         {
             uint16_t step = strategies[mover]->update(*mover);
-
-            eventBus.publish(
-                MoverReachedIndexEvent{
-                    mover,
-                    mover->getCurrentCellIndex(),
-                    step});
+            if (step == 2)
+            {
+                movementChannel.publish(
+                    MovementStepEvent{
+                        mover->getId(),
+                        step,
+                        mover->getCurrentCellIndex()});
+            }
             // publish each event and let subscribers decide if they want to react to it based on mover ID or index or step
         }
     }
@@ -41,5 +44,5 @@ public:
 private:
     std::vector<MovableComponent *> movers;
     std::unordered_map<MovableComponent *, std::unique_ptr<MovementStrategy>> strategies;
-    EventBus &eventBus;
+    event::Channel<MovementStepEvent> &movementChannel;
 };

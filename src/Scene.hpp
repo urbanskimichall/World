@@ -8,7 +8,6 @@
 #include "grid/GridSpacing.hpp"
 #include "components/RectangleComponent.hpp"
 #include "HomeTile.hpp"
-#include "Tooltip.hpp"
 #include "Farmer.hpp"
 #include "FarmerPath.hpp"
 #include "MovementSystem.hpp"
@@ -143,15 +142,6 @@ public:
         movementSystem.update();
         shootingSystem.update();
         //formationMovementManager.update();
-
-        if (const auto *c = componentManager.getHoveredComponent(mouseWorld))
-        {
-            tooltip.show(c->getInfo(), mouseWorld);
-        }
-        else
-        {
-            tooltip.hide();
-        }
     }
 
     void draw(sf::RenderWindow &target) const
@@ -161,7 +151,6 @@ public:
          sf::FloatRect bounds = getViewBounds(target);
          grid.draw(target, bounds);
         shootingSystem.draw(target);
-        tooltip.draw(target);
 
         const auto &formationFactoryPositions = formationFactory.getFormationPositions();
         for (const auto &pos : formationFactoryPositions)
@@ -249,7 +238,6 @@ private:
 
     grid::Grid grid;
     components::ComponentManager componentManager;
-    Tooltip tooltip;
 
     event::Channel<MovementStepEvent> movementChannel;
     event::Channel<FoodDeliveredEvent> foodDeliveryChannel;

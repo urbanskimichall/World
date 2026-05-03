@@ -71,20 +71,6 @@ namespace components
             return pts;
         }
 
-        BoxInfo getInfo() const override
-        {
-            BoxInfo info;
-            info.name = "Rectangle Component";
-            info.level = 0;
-            info.capacity = 0;
-            info.occupants = 0;
-            info.happiness = 0;
-            info.farmers = 0;
-            info.builders = 0;
-            info.soldiers = 0;
-            return info;
-        }
-
     private:
         sf::ConvexShape shape;
 

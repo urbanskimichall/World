@@ -153,19 +153,6 @@ public:
         points[3] = {bounds.position.x, bounds.position.y + bounds.size.y};
         return points;
     }
-    components::BoxInfo getInfo() const override
-    {
-        components::BoxInfo info;
-        info.name = "Mover";
-        info.level = 0;
-        info.capacity = 0;
-        info.occupants = 0;
-        info.happiness = 0;
-        info.farmers = 0;
-        info.builders = 0;
-        info.soldiers = 0;
-        return info;
-    }
     sf::Vector2f getSize() const override
     {
         sf::FloatRect bounds = mover.getGlobalBounds();

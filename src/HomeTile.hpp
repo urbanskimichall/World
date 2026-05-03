@@ -38,19 +38,6 @@ public:
         points[3] = {bounds.position.x, bounds.position.y + bounds.size.y};
         return points;
     }
-    components::BoxInfo getInfo() const override
-    {
-        components::BoxInfo info;
-        info.name = "Simple Home";
-        info.level = 1;
-        info.capacity = 4;
-        info.occupants = 2;
-        info.happiness = 80;
-        info.farmers = 1;
-        info.builders = 0;
-        info.soldiers = 1;
-        return info;
-    }
     sf::Vector2f getSize() const override
     {
         return {sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y};

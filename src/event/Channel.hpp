@@ -16,6 +16,14 @@ struct ShootEvent
     uint16_t entityId;
 };
 
+struct FoodDeliveredEvent
+{
+    uint16_t entityId;
+    uint32_t cellIndex;
+    uint32_t homeIndex;
+    uint16_t amount;
+};
+
 namespace event
 {
 

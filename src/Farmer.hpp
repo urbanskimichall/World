@@ -9,7 +9,7 @@ class Farmer : public MovableComponent
 {
 public:
     Farmer(grid::Grid &grid, uint16_t id, const sf::Vector2f &initPosition, uint16_t homeId)
-        : MovableComponent(grid, id), homeId(homeId)
+        : MovableComponent(grid, id, homeId)
     {
         mover.setFillColor(sf::Color::Blue);
         mover.setPosition(initPosition + sf::Vector2f{10.f, 10.f});
@@ -52,5 +52,5 @@ public:
     }
 
 private:
-    uint16_t homeId;
+    //uint16_t homeId;
 };

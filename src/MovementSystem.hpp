@@ -11,7 +11,8 @@
 class MovementSystem
 {
 public:
-    MovementSystem(event::Channel<MovementStepEvent> &movementChannel) : movementChannel(movementChannel) {}
+    MovementSystem(event::Channel<MovementStepEvent> &movementChannel, event::Channel<FoodDeliveredEvent> &foodDeliveryChannel)
+        : movementChannel(movementChannel), foodDeliveryChannel(foodDeliveryChannel) {}
 
     void addMover(
         MovableComponent &mover,
@@ -36,6 +37,13 @@ public:
                         mover->getId(),
                         step,
                         mover->getCurrentCellIndex()});
+                foodDeliveryChannel.publish(
+                    FoodDeliveredEvent{
+                        mover->getId(),
+                        mover->getCurrentCellIndex(),
+                        mover->getHomeId(),
+                        10 // Replace with actual amount
+                    });
             }
             // publish each event and let subscribers decide if they want to react to it based on mover ID or index or step
         }
@@ -45,4 +53,5 @@ private:
     std::vector<MovableComponent *> movers;
     std::unordered_map<MovableComponent *, std::unique_ptr<MovementStrategy>> strategies;
     event::Channel<MovementStepEvent> &movementChannel;
+    event::Channel<FoodDeliveredEvent> &foodDeliveryChannel;
 };

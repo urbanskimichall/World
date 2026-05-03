@@ -18,6 +18,7 @@
 #include "PathFollowingMovement.hpp"
 #include "FormationFactory.hpp"
 #include "ShootingSystem.hpp"
+#include "ResourceSystem.hpp"
 #include "SceneBoundaries.hpp"
 #include "grid/GridSpacing.hpp"
 
@@ -208,6 +209,15 @@ private:
         {
             LOG_INFO("Received ShootEvent (shoot reached target) for entity ID ", event.entityId);
         });
+
+        foodDeliveryChannel.subscribe([this](const FoodDeliveredEvent& event)
+        {
+            resourceSystem.update(event);
+            LOG_INFO("Received FoodDeliveredEvent for entity ID ", event.entityId,
+                "delivered amount: ", event.amount,
+                " cell index: ", event.cellIndex,
+                " home index: ", event.homeIndex);
+        });
     }
 
     sf::FloatRect getViewBounds(const sf::RenderWindow &window) const
@@ -240,11 +250,12 @@ private:
     grid::Grid grid;
     components::ComponentManager componentManager;
     Tooltip tooltip;
-    //EventBus eventBus{};
 
     event::Channel<MovementStepEvent> movementChannel;
-    MovementSystem movementSystem{movementChannel};
+    event::Channel<FoodDeliveredEvent> foodDeliveryChannel;
+    MovementSystem movementSystem{movementChannel, foodDeliveryChannel};
     event::Channel<ShootEvent> shootChannel;
     ShootingSystem shootingSystem{grid, shootChannel};
+    ResourceSystem resourceSystem{foodDeliveryChannel};
     FormationFactory formationFactory;
 };

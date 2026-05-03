@@ -19,10 +19,15 @@ enum class MovementStep : uint8_t
 class MovableComponent : public components::Component
 {
 public:
-    MovableComponent(grid::Grid &grid, uint16_t id) : components::Component(grid, id) {}
+    MovableComponent(grid::Grid &grid, uint16_t id, uint16_t homeId) : components::Component(grid, id), homeId(homeId) {}
     void init()
     {
         mover.setFillColor(sf::Color::White);
+    }
+
+    virtual uint16_t getHomeId() const
+    {
+        return homeId;
     }
 
     components::Capability capabilities() const override
@@ -174,6 +179,7 @@ public:
     }
 
 protected:
+    uint16_t homeId;
     std::vector<uint32_t> path;
     uint32_t currentSegment = 0; // which segment (path[i] -> path[i+1]) we are on
     float segmentProgress = 0.f; // 0..1 interpolation along the segment
